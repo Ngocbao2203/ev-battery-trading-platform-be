@@ -1,0 +1,6 @@
+@EBTP.API_HostAddress = http://localhost:5296
+
+GET {{EBTP.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
