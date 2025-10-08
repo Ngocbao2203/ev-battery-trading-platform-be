@@ -15,14 +15,56 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 //Service
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
                     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
                 );
 
 // Add services to the container.
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "CraftGoPlay Web App API", Version = "v1" });
+
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Please enter into field the word 'Bearer' followed by space and JWT",
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+            {
+                {
+                    new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                    {
+                        Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                        {
+                            Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    new string[] { }
+                }
+            });
+
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("UserPolicy", policy =>
+        policy.RequireClaim(System.Security.Claims.ClaimTypes.Role, "User"));
+    options.AddPolicy("AdminPolicy", policy =>
+        policy.RequireClaim(System.Security.Claims.ClaimTypes.Role, "Admin"));
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
