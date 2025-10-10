@@ -13,17 +13,19 @@ namespace EBTP.Repository.Repositories
         private readonly AppDbContext _context;
         private readonly IUserRepository _userRepository;
         private readonly IAuthRepository _authRepository;
+        private readonly IBrandRepository _brandRepository;
 
-        public UnitOfWork(AppDbContext context, IUserRepository userRepository, IAuthRepository authRepository)
+        public UnitOfWork(AppDbContext context, IUserRepository userRepository, IAuthRepository authRepository, IBrandRepository brandRepository)
         {
             _context = context;
             _userRepository = userRepository;
             _authRepository = authRepository;
+            _brandRepository = brandRepository;
         }
 
         public IUserRepository userRepository => _userRepository;
-
         public IAuthRepository authRepository => _authRepository;
+        public IBrandRepository brandRepository => _brandRepository;
 
         public async Task<int> SaveChangeAsync()
         {

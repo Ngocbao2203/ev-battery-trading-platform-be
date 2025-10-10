@@ -16,12 +16,12 @@ var builder = WebApplication.CreateBuilder(args);
 //Repository
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
+builder.Services.AddScoped<IBrandRepository, BrandRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 //Service
 builder.Services.AddScoped<IAuthService, AuthService>();
-
+builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
