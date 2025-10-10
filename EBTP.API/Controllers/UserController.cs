@@ -1,4 +1,5 @@
-﻿using EBTP.Service.IServices;
+﻿using EBTP.Service.DTOs.User;
+using EBTP.Service.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +23,20 @@ namespace EBTP.API.Controllers
         {
             var getUser = await _userService.GetCurrentUserById();
             return Ok(getUser);
+        }
+        [HttpPut("UpdateInfoUser")]
+        [Authorize]
+        public async Task<IActionResult> UpdateUserInfo([FromForm] UpdateInfoUserDTO updateDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Dữ liệu không hợp lệ.");
+
+            var result = await _userService.UpdateUserInfoAsync(updateDto);
+
+            if (result.Error != 0)
+                return BadRequest(result);
+
+            return Ok(result);
         }
     }
 }

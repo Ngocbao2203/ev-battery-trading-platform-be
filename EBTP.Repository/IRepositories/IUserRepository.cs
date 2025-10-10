@@ -17,5 +17,6 @@ namespace EBTP.Repository.IRepositories
         Task<User> GetUserByResetToken(string resetToken);
         Task UpdateAsync(User user);
         Task AddAsync(User user);
+        Task<User> GetUserById(Guid userId);
     }
 }

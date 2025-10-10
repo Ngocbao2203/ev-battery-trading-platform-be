@@ -61,5 +61,11 @@ namespace EBTP.Repository.Repositories
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.ResetToken == resetToken);
         }
+        public async Task<User> GetUserById(Guid userId)
+        {
+            return await _context.User
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+        }
     }
 }

@@ -14,5 +14,6 @@ namespace EBTP.Service.IServices
         Task<User> GetByEmail(string email);
         Task UpdateUserAsync(User user);
         Task<Result<UserDTO>> GetCurrentUserById();
+        Task<Result<object>> UpdateUserInfoAsync(UpdateInfoUserDTO updateDto);
     }
 }

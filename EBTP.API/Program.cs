@@ -1,6 +1,7 @@
 using EBTP.Repository.Data;
 using EBTP.Repository.IRepositories;
 using EBTP.Repository.Repositories;
+using EBTP.Service.Abstractions.CloudinaryService;
 using EBTP.Service.IServices;
 using EBTP.Service.Mappers;
 using EBTP.Service.Services;
@@ -24,6 +25,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
                     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
                 );
@@ -32,7 +35,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "CraftGoPlay Web App API", Version = "v1" });
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "EBTB Web App API", Version = "v1" });
 
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
@@ -72,6 +75,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
+//Cloundinary
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 var key = System.Text.Encoding.ASCII.GetBytes(builder.Configuration["JwtSettings:SecretKey"]);
