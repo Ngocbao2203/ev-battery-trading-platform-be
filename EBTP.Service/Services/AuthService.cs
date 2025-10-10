@@ -4,6 +4,7 @@ using EBTP.Repository.IRepositories;
 using EBTP.Repository.Repositories;
 using EBTP.Service.Abstractions.Shared;
 using EBTP.Service.DTOs.Auth;
+using EBTP.Service.DTOs.Email;
 using EBTP.Service.IServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -244,6 +245,118 @@ namespace EBTP.Service.Services
             await _unitOfWork.userRepository.UpdateAsync(user);
             return true;
         }
+        public async Task ChangePasswordAsync(string email, ChangePasswordDTO changePasswordDto)
+        {
+            try
+            {
+                var user = await _unitOfWork.userRepository.GetUserByEmail(email);
+
+                if (user == null || !BCrypt.Net.BCrypt.Verify(changePasswordDto.OldPassword, user.PasswordHash))
+                {
+                    throw new ArgumentException("Mật khẩu sai.");
+                }
+
+                if (changePasswordDto.NewPassword == changePasswordDto.OldPassword)
+                {
+                    throw new InvalidOperationException("Mật khẩu mới không được phép giống với mật khẩu cũ.");
+                }
+
+                if (!ValidatePassword(changePasswordDto.NewPassword))
+                {
+                    throw new ArgumentException("Mật khẩu mới phải chứa ít nhất một chữ cái viết hoa và một ký tự đặc biệt.");
+                }
+
+                user.PasswordHash = HashPassword(changePasswordDto.NewPassword);
+                await _unitOfWork.userRepository.UpdateAsync(user);
+            }
+            catch (ArgumentException ex)
+            {
+                // Handle cases where the provided password details are invalid
+                throw new ApplicationException("Thay đổi mật khẩu không thành công do nhập dữ liệu không hợp lệ.", ex);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Handle cases where the new password is the same as the old password
+                throw new ApplicationException("Không thể thay đổi mật khẩu do hạn chế về mặt hoạt động.", ex);
+            }
+            catch (Exception ex)
+            {
+                // General exception handling
+                throw new ApplicationException("Đã xảy ra lỗi khi thay đổi mật khẩu.", ex);
+            }
+        }
+        public async Task RequestPasswordResetAsync(ForgotPasswordRequestDTO forgotPasswordRequestDto)
+        {
+            try
+            {
+                var user = await _unitOfWork.userRepository.GetUserByEmail(forgotPasswordRequestDto.Email);
+
+                if (user == null || !user.IsVerified)
+                {
+                    throw new KeyNotFoundException("Người dùng không tìm thấy hoặc chưa được kích hoạt.");
+                }
+
+                var token = GenerateResetToken();
+                user.ResetToken = token;
+                user.ResetTokenExpiry = DateTime.UtcNow.AddHours(8);
+
+                await _unitOfWork.userRepository.UpdateAsync(user);
+
+                //var resetLink = $"{_configuration["AppSettings:FrontendUrl"]}/reset-password?token={token}"; -- FRONT-END ONLY
+
+                await _emailService.SendEmailAsync(new EmailDTO
+                {
+                    To = user.Email,
+                    Subject = "Yêu cầu đặt lại mật khẩu",
+                    //Body = $"Please reset your password by clicking on the following link: <a href='{resetLink}'>Reset Password</a>" -- FRONT-END ONLY
+
+                    Body = @$"Mã token của bạn để đặt lại mật khẩu là: {token}"
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                // Handle cases where the user is not found or not activated
+                throw new ApplicationException("Yêu cầu đặt lại mật khẩu không thành công do không tìm thấy người dùng hoặc không được kích hoạt.", ex);
+            }
+            catch (Exception ex)
+            {
+                // General exception handling
+                throw new ApplicationException("Đã xảy ra lỗi khi yêu cầu đặt lại mật khẩu.", ex);
+            }
+        }
+        public async Task ResetPasswordAsync(ResetPasswordDTO resetPasswordDto)
+        {
+            try
+            {
+                var user = await _unitOfWork.userRepository.GetUserByResetToken(resetPasswordDto.Token);
+
+                if (user == null || user.ResetTokenExpiry < DateTime.UtcNow.AddHours(7))
+                {
+                    throw new ArgumentException("Invalid or expired token.");
+                }
+
+                if (!ValidatePassword(resetPasswordDto.NewPassword))
+                {
+                    throw new ArgumentException("Mật khẩu mới phải chứa ít nhất một chữ cái viết hoa, một ký tự đặc biệt và dài ít nhất 6 ký tự.");
+                }
+
+                user.PasswordHash = HashPassword(resetPasswordDto.NewPassword);
+                user.ResetToken = null;
+                user.ResetTokenExpiry = null;
+
+                await _unitOfWork.userRepository.UpdateAsync(user);
+            }
+            catch (ArgumentException ex)
+            {
+                // Handle cases where the token is invalid or the new password does not meet requirements
+                throw new ApplicationException("Đặt lại mật khẩu không thành công do nhập không hợp lệ.", ex);
+            }
+            catch (Exception ex)
+            {
+                // General exception handling
+                throw new ApplicationException("Đã xảy ra lỗi khi đặt lại mật khẩu.", ex);
+            }
+        }
         private async Task<Authenticator> GenerateJwtToken(User user)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]));
@@ -289,6 +402,24 @@ namespace EBTP.Service.Services
                 rng.GetBytes(byteArray);
                 var otp = BitConverter.ToUInt32(byteArray, 0) % 1000000;
                 return otp.ToString("D6");
+            }
+        }
+        private bool ValidatePassword(string password)
+        {
+            bool hasUpperCase = password.Any(char.IsUpper);
+            bool hasSpecialChar = password.Any(ch => !char.IsLetterOrDigit(ch));
+            bool isValidLength = password.Length >= 6;
+
+            return hasUpperCase && hasSpecialChar && isValidLength;
+        }
+
+        private string GenerateResetToken()
+        {
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                var byteArray = new byte[32];
+                rng.GetBytes(byteArray);
+                return Convert.ToBase64String(byteArray);
             }
         }
     }

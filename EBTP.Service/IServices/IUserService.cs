@@ -1,4 +1,6 @@
 ﻿using EBTP.Repository.Entities;
+using EBTP.Service.Abstractions.Shared;
+using EBTP.Service.DTOs.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +13,6 @@ namespace EBTP.Service.IServices
     {
         Task<User> GetByEmail(string email);
         Task UpdateUserAsync(User user);
+        Task<Result<UserDTO>> GetCurrentUserById();
     }
 }

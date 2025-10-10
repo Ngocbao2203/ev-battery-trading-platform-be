@@ -47,5 +47,19 @@ namespace EBTP.Repository.Repositories
             _context.User.Update(user);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<User> GetAllUserById(Guid id)
+        {
+            return await _context.User
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(i => i.Id == id);
+        }
+
+        public async Task<User> GetUserByResetToken(string resetToken)
+        {
+            return await _context.User
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.ResetToken == resetToken);
+        }
     }
 }

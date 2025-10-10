@@ -3,8 +3,10 @@ using EBTP.Service.Abstractions.Shared;
 using EBTP.Service.DTOs.Auth;
 using EBTP.Service.IServices;
 using EBTP.Service.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace EBTP.API.Controllers
 {
@@ -122,6 +124,54 @@ namespace EBTP.API.Controllers
                 }
 
                 return Ok(new { Message = "Xác thực Email thành công." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+        }
+        [HttpPost("user/password/change")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordDTO changePasswordDto)
+        {
+            try
+            {
+                var email = User.FindFirst(ClaimTypes.Email)?.Value;
+                if (email == null)
+                {
+                    return Unauthorized(new { Message = "Token không hợp lệ." });
+                }
+
+                await _authService.ChangePasswordAsync(email, changePasswordDto);
+                return Ok(new { Message = "Mật khẩu đã được thay đổi thành công, vui lòng đăng nhập lại." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+        }
+
+        [HttpPost("user/password/forgot")]
+        public async Task<IActionResult> ForgotPassword([FromForm] ForgotPasswordRequestDTO forgotPasswordRequestDto)
+        {
+            try
+            {
+                await _authService.RequestPasswordResetAsync(forgotPasswordRequestDto);
+                return Ok(new { Message = "Mã thông báo đặt lại mật khẩu đã được gửi thành công đến email của bạn." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+        }
+
+        [HttpPost("user/password/reset")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDTO resetPasswordDto)
+        {
+            try
+            {
+                await _authService.ResetPasswordAsync(resetPasswordDto);
+                return Ok(new { Message = "Đã đặt lại mật khẩu thành công." });
             }
             catch (Exception ex)
             {

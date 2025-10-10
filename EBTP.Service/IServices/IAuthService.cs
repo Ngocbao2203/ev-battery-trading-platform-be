@@ -15,5 +15,9 @@ namespace EBTP.Service.IServices
         Task<bool> VerifyOtpAsync(string email, string otp);
         Task<Result<object>> ResendOtpAsync(string email);
         Task<bool> VerifyOtpAndCompleteRegistrationAsync(string email, string otp);
+        Task ChangePasswordAsync(string email, ChangePasswordDTO changePasswordDto);
+        //FORGOT PASSWORD
+        Task RequestPasswordResetAsync(ForgotPasswordRequestDTO forgotPasswordRequestDto);
+        Task ResetPasswordAsync(ResetPasswordDTO resetPasswordDto);
     }
 }
