@@ -15,6 +15,8 @@ namespace EBTP.Repository.Entities
         public decimal Price { get; set; }
         public ListingStatusEnum ListingStatus { get; set; }
         public Guid BrandId { get; set; }
+        public Guid UserId { get; set; }
+        public Guid PackageId { get; set; }
         public string Model { get; set; }
         public int YearOfManufacture { get; set; }
         public string Area { get; set; }
@@ -30,5 +32,11 @@ namespace EBTP.Repository.Entities
         public StatusEnum Status { get; set; }
         [ForeignKey("BrandId")]
         public Brand Brand { get; set; }
+
+        [ForeignKey("UserId")]
+        public User User { get; set; }
+        [ForeignKey("PackageId")]
+        public Package Package { get; set; }
+
     }
 }

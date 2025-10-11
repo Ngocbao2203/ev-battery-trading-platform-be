@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EBTP.Repository.Entities;
 using EBTP.Service.DTOs.Brand;
+using EBTP.Service.DTOs.Package;
 using EBTP.Service.DTOs.User;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,11 @@ namespace EBTP.Service.Mappers
             CreateMap<CreateBrandDTO, Brand>().ReverseMap();
             CreateMap<UpdateBrandDTO, Brand>().ReverseMap();
             CreateMap<BrandDTO, Brand>().ReverseMap();
+
+            //Package
+            CreateMap<CreatePakageDTO, Package>().ReverseMap();
+            CreateMap<UpdatePackageDTO, Package>().ReverseMap();
+            CreateMap<PackageDTO, Package>().ReverseMap();
         }
     }
 }
