@@ -17,6 +17,10 @@ namespace EBTP.Repository.Data
 
         #region
         public DbSet<User> User { get; set; }
+        public DbSet<Brand> Brand { get; set; }
+        public DbSet<Listing> Listing { get; set; }
+        public DbSet<ListingImage> ListingImage { get; set; }
+        public DbSet<Package> Package { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -25,6 +29,74 @@ namespace EBTP.Repository.Data
                new Role { Id = 1, RoleName = "Admin" },
                new Role { Id = 2, RoleName = "User" }
             );
+            //Brand
+            modelBuilder.Entity<Brand>(e =>
+            {
+                e.ToTable("Brand");
+                e.HasKey(p => p.Id);
+                e.Property(p => p.Name)
+                .IsRequired()
+                .HasMaxLength(100);
+            });
+
+            //Listing
+            modelBuilder.Entity<Listing>(e =>
+            {
+                e.ToTable("Listing");
+                e.HasKey(p => p.Id);
+                e.Property(p => p.Status)
+                .IsRequired()
+                .HasConversion(v => v.ToString(), v => (StatusEnum)System.Enum.Parse(typeof(StatusEnum), v));
+                e.Property(p => p.Category)
+                .IsRequired()
+                .HasConversion(v => v.ToString(), v => (CategoryEnum)System.Enum.Parse(typeof(CategoryEnum), v));
+                e.Property(p => p.ListingStatus)
+                .IsRequired()
+                .HasConversion(v => v.ToString(), v => (ListingStatusEnum)System.Enum.Parse(typeof(ListingStatusEnum), v));
+            });
+
+            modelBuilder.Entity<Listing>()
+            .HasOne(p => p.Brand)
+            .WithMany(p => p.Listings);
+
+            modelBuilder.Entity<Listing>()
+            .HasOne(p => p.User)
+            .WithMany(p => p.Listings);
+
+            modelBuilder.Entity<Listing>()
+            .HasOne(p => p.Package)
+            .WithMany(p => p.Listings);
+
+            //Listing Image
+            modelBuilder.Entity<ListingImage>(e =>
+            {
+                e.ToTable("ListingImage");
+                e.HasKey(p => p.Id);
+                e.Property(p => p.ImageUrl)
+                .IsRequired()
+                .HasMaxLength(250);
+                e.HasOne(p => p.Listing)
+                .WithMany(p => p.ListingImages)
+                .HasForeignKey(p => p.ListingId)
+                .OnDelete(DeleteBehavior.Cascade);
+            });
+            //Package
+            modelBuilder.Entity<Package>(e =>
+            {
+                e.ToTable("Package");
+                e.HasKey(p => p.Id);
+                e.Property(p => p.Name)
+                .IsRequired()
+                .HasMaxLength(100);
+                e.Property(p => p.Description)
+                .HasMaxLength(500);
+                e.Property(p => p.Status)
+                .IsRequired()
+                .HasConversion(v => v.ToString(), v => (StatusEnum)System.Enum.Parse(typeof(StatusEnum), v));
+                e.Property(p => p.PackageType)
+                .IsRequired()
+                .HasConversion(v => v.ToString(), v => (PackageTypeEnum)System.Enum.Parse(typeof(PackageTypeEnum), v));
+            });
         }
     }
 }

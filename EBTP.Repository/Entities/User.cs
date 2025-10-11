@@ -30,5 +30,7 @@ namespace EBTP.Repository.Entities
         public int RoleId { get; set; }
         [ForeignKey("RoleId")]
         public Role Role { get; set; }
+
+        public ICollection<Listing> Listings { get; set; }
     }
 }
