@@ -15,6 +15,5 @@ namespace EBTP.Repository.Entities
         public string Description { get; set; }
         public PackageTypeEnum PackageType { get; set; }
         public StatusEnum Status { get; set; }
-        public ICollection<Listing> Listings { get; set; } = new List<Listing>();
     }
 }

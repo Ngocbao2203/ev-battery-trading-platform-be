@@ -1,12 +1,11 @@
-﻿using EBTP.Repository.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EBTP.Repository.Enum
+namespace EBTP.Repository.Entities
 {
     public class ListingImage : BaseEntity
     {

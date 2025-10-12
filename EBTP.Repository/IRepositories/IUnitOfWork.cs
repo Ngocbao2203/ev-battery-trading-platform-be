@@ -12,6 +12,8 @@ namespace EBTP.Repository.IRepositories
         IAuthRepository authRepository { get; }
         IBrandRepository brandRepository { get; }
         IPackageRepository packageRepository { get; }
+        IListingRepository listingRepository { get; }
+        IListingImageRepository listingImageRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }
