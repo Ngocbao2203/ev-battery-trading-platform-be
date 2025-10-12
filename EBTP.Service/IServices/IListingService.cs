@@ -1,0 +1,21 @@
+﻿using EBTP.Repository.Enum;
+using EBTP.Service.Abstractions.Shared;
+using EBTP.Service.DTOs.Listing;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace EBTP.Service.IServices
+{
+    public interface IListingService
+    {
+        Task<Result<List<ListingDTO>>> GetAllAsync(string? search, int pageIndex, int pageSize, decimal from, decimal to, ListingStatusEnum? listingStatusEnum, CategoryEnum? categoryEnum);
+        Task<Result<List<ListingDTO>>> GetListingsByStatusAsync(int pageIndex, int pageSize, decimal from, decimal to, StatusEnum? status);
+        Task<Result<ListingDTO>> GetByIdAsync(Guid id);
+        Task<Result<object>> CreateAsync(CreateListingDTO createListingDTO);
+        /*        Task<Result<ListingDTO>> UpdateAsync(Guid id, UpdateListingDTO updateListingDTO);
+                Task<Result<bool>> DeleteAsync(Guid id);*/
+    }
+}

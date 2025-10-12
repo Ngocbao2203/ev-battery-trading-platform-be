@@ -21,14 +21,12 @@ namespace EBTP.Repository.Repositories
         public async Task<List<Package>> GetAllPackageAsync()
         {
             return await _context.Package.Where(p => !p.IsDeleted)
-                .Include(p => p.Listings)
                 .ToListAsync();
         }
 
         public async Task<Package> GetPackageByIdAsync(Guid id)
         {
             return await _context.Package.Where(p => !p.IsDeleted && p.Id == id)
-                .Include(p => p.Listings)
                 .FirstOrDefaultAsync();
         }
 

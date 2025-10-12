@@ -63,10 +63,6 @@ namespace EBTP.Repository.Data
             .HasOne(p => p.User)
             .WithMany(p => p.Listings);
 
-            modelBuilder.Entity<Listing>()
-            .HasOne(p => p.Package)
-            .WithMany(p => p.Listings);
-
             //Listing Image
             modelBuilder.Entity<ListingImage>(e =>
             {
