@@ -2,6 +2,7 @@ using EBTP.Repository.Data;
 using EBTP.Repository.IRepositories;
 using EBTP.Repository.Repositories;
 using EBTP.Service.Abstractions.CloudinaryService;
+using EBTP.Service.Abstractions.PaymentService;
 using EBTP.Service.IServices;
 using EBTP.Service.Mappers;
 using EBTP.Service.Services;
@@ -21,6 +22,8 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IPackageRepository, PackageRepository>();
 builder.Services.AddScoped<IListingRepository, ListingRepository>();
 builder.Services.AddScoped<IListingImageRepository, ListingImageRepository>();
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
 //Service
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -29,6 +32,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPackageService, PakageService>();
 builder.Services.AddScoped<IListingService, ListingService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
@@ -38,6 +42,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 //Cloundinary
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+//Payment
+builder.Services.Configure<VnPaySettings>(builder.Configuration.GetSection("VnPay"));
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -72,7 +78,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("UserPolicy", policy =>
-        policy.RequireClaim(System.Security.Claims.ClaimTypes.Role, "User"));
+policy.RequireClaim(System.Security.Claims.ClaimTypes.Role, "User"));
     options.AddPolicy("AdminPolicy", policy =>
         policy.RequireClaim(System.Security.Claims.ClaimTypes.Role, "Admin"));
 });
@@ -166,6 +172,8 @@ else
         c.RoutePrefix = string.Empty;
     });
 }
+
+app.UseCors("AllowSpecificOrigin");
 
 app.UseHttpsRedirection();
 

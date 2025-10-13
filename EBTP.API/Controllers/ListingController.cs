@@ -68,5 +68,18 @@ namespace EBTP.API.Controllers
             }
             return Ok(result);
         }
+        [HttpGet("VnpayUrl/{listingId}")]
+        public async Task<IActionResult> CreateVnPayUrl(Guid listingId)
+        {
+            var result = await _listingService.CreateVnPayUrlAsync(listingId, HttpContext);
+            return StatusCode(result.Error == 0 ? 200 : 400, result);
+        }
+
+        [HttpGet("vnpay-return")]
+        public async Task<IActionResult> VnPayReturn()
+        {
+            var result = await _listingService.HandleVnPayReturnAsync(Request.Query);
+            return Ok(result);
+        }
     }
 }

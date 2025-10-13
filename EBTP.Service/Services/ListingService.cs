@@ -21,14 +21,16 @@ namespace EBTP.Service.Services
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICloudinaryService _cloudinaryService;
+        private readonly IPaymentService _paymentService;
         private static string FOLDER = "listings";
 
-        public ListingService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ICloudinaryService cloudinaryService)
+        public ListingService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, ICloudinaryService cloudinaryService, IPaymentService paymentService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _cloudinaryService = cloudinaryService;
+            _paymentService = paymentService;
         }
 
         public async Task<Result<List<ListingDTO>>> GetAllAsync(string? search, int pageIndex, int pageSize, decimal from, decimal to, ListingStatusEnum? listingStatusEnum, CategoryEnum? categoryEnum)
@@ -134,6 +136,132 @@ namespace EBTP.Service.Services
                     Message = ex.Message
                 };
             }
+        }
+        public async Task<Result<string>> CreateVnPayUrlAsync(Guid listingId, HttpContext httpContext)
+        {
+            var listing = await _unitOfWork.listingRepository.GetListingById(listingId);
+            if (listing == null)
+            {
+                return new Result<string>
+                {
+                    Error = 1,
+                    Message = "Không tìm thấy đơn hàng với ListingId tương ứng",
+                    Data = null
+                };
+            }
+
+            var totalAmount = listing.Package.Price;
+
+            var url = await _paymentService.CreatePaymentUrl(listingId, totalAmount, httpContext);
+            return new Result<string>()
+            {
+                Error = 0,
+                Message = "Tạo URL thanh toán thành công",
+                Data = url
+            };
+        }
+        public async Task<Result<object>> HandleVnPayReturnAsync(IQueryCollection query)
+{
+    var listingId = Guid.Parse(query["vnp_TxnRef"]);
+
+    var listing = await _unitOfWork.listingRepository.GetListingById(listingId);
+    if (listing == null)
+    {
+        return new Result<object>
+        {
+            Error = 1,
+            Message = "Không tìm thấy đơn hàng nào cho ListingId.",
+            Data = null
+        };
+    }
+
+    var isValid = await _paymentService.ValidateReturnData(query);
+    var responseCode = query["vnp_ResponseCode"].ToString();
+    var userId = listing.UserId;
+
+
+    Payment payment;
+    payment = new Payment
+    {
+        ListingId = listingId,
+        TransactionNo = query["vnp_TransactionNo"],
+        BankCode = query["vnp_BankCode"],
+        ResponseCode = responseCode,
+        SecureHash = query["vnp_SecureHash"],
+        CreatedBy = userId,
+        PaymentMethod = PaymentMethodEnum.VnPay,
+        RawData = string.Join("&", query.Select(x => $"{x.Key}={x.Value}")),
+        CreationDate = DateTime.UtcNow.AddHours(7),
+        CreatedAt = DateTime.UtcNow.AddHours(7),
+        IsDeleted = false
+    };
+    await _unitOfWork.paymentRepository.AddAsync(payment);
+            if (isValid && responseCode == "00")
+            {
+                var getListing = await _unitOfWork.listingRepository.GetListingById(listing.Id);
+                getListing.Status = StatusEnum.Pending;
+                getListing.ModificationDate = DateTime.UtcNow.AddHours(7);
+                _unitOfWork.listingRepository.Update(getListing);
+
+                var transaction = new Transaction
+                {
+                    Id = Guid.NewGuid(),
+                    Amount = getListing.Package.Price,
+                    UserId = (Guid)userId,
+                    ListingId = listing.Id,
+                    PaymentId = payment.Id,
+                    PackageId = (Guid)listing.PackageId,
+                    Currency = "VND",
+                    PaymentMethod = "Online",
+                    Status = PaymentStatusEnum.Success,
+                    TransactionDate = DateTime.UtcNow.AddHours(7),
+                    Notes = @$"Thanh toán thành công bài đăng ""{listing.Id}""",
+                    IsDeleted = false,
+                    CreationDate = DateTime.UtcNow.AddHours(7)
+                };
+                await _unitOfWork.transactionRepository.AddAsync(transaction);
+            }
+            else
+            {
+                listing.TransactionId = Guid.NewGuid();
+                var getListing = await _unitOfWork.listingRepository.GetListingById(listing.Id);
+                getListing.Status = StatusEnum.Pending;
+                getListing.ModificationDate = DateTime.UtcNow.AddHours(7);
+                _unitOfWork.listingRepository.Update(getListing);
+                var transaction = new Transaction
+                {
+                    Id = Guid.NewGuid(),
+                    Amount = getListing.Package.Price,
+                    UserId = (Guid)userId,
+                    ListingId = listing.Id,
+                    PaymentId = payment.Id,
+                    PackageId = (Guid)listing.PackageId,
+                    Currency = "VND",
+                    PaymentMethod = "Online",
+                    Status = PaymentStatusEnum.Canceled,
+                    Notes = @$"Thanh toán thất bại bài đăng ""{listing.Id}""",
+                    CreatedBy = userId,
+                    IsDeleted = false,
+                    CreationDate = DateTime.UtcNow.AddHours(7)
+                };
+                await _unitOfWork.transactionRepository.AddAsync(transaction);
+                await _unitOfWork.SaveChangeAsync();
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Thanh toán thất bại hoặc không hợp lệ.",
+                    Data = null
+                };
+            }
+
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Thanh toán thành công",
+                Data = listingId
+            };
         }
     }
 }
