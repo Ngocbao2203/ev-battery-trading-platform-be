@@ -64,6 +64,7 @@ namespace EBTP.Repository.Repositories
                 .Include(lt => lt.ListingImages)
                 .Include(lt => lt.Brand)
                 .Include(lt => lt.User)
+                .Include(lt => lt.Package)
                 .OrderByDescending(x => x.CreationDate)
                 .Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)
@@ -75,6 +76,7 @@ namespace EBTP.Repository.Repositories
                 .Include(lt => lt.ListingImages)
                 .Include(lt => lt.Brand)
                 .Include(lt => lt.User)
+                .Include(lt => lt.Package)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             return listing;

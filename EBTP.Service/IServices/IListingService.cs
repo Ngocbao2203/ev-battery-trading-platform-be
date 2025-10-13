@@ -1,6 +1,7 @@
 ﻿using EBTP.Repository.Enum;
 using EBTP.Service.Abstractions.Shared;
 using EBTP.Service.DTOs.Listing;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,5 +18,7 @@ namespace EBTP.Service.IServices
         Task<Result<object>> CreateAsync(CreateListingDTO createListingDTO);
         /*        Task<Result<ListingDTO>> UpdateAsync(Guid id, UpdateListingDTO updateListingDTO);
                 Task<Result<bool>> DeleteAsync(Guid id);*/
+        Task<Result<string>> CreateVnPayUrlAsync(Guid listingId, HttpContext httpContext);
+        Task<Result<object>> HandleVnPayReturnAsync(IQueryCollection query);
     }
 }

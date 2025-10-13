@@ -22,6 +22,8 @@ namespace EBTP.Service.DTOs.Listing
         public ListingStatusEnum ListingStatus { get; set; }
         [Required(ErrorMessage = "Thương hiệu là bắt buộc.")]
         public Guid BrandId { get; set; }
+        [Required(ErrorMessage = "Gói là bắt buộc.")]
+        public Guid? PackageId { get; set; }
         public string Model { get; set; }
         public int YearOfManufacture { get; set; }
         [Required(ErrorMessage = "Khu vực là bắt buộc.")]

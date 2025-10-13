@@ -14,9 +14,10 @@ namespace EBTP.Repository.Entities
         public string Title { get; set; }
         public decimal Price { get; set; }
         public ListingStatusEnum ListingStatus { get; set; }
-        public Guid BrandId { get; set; }
-        public Guid UserId { get; set; }
-        public Guid PackageId { get; set; }
+        public Guid? BrandId { get; set; }
+        public Guid? UserId { get; set; }
+        public Guid? PackageId { get; set; }
+        public Guid? TransactionId { get; set; }
         public string? Model { get; set; }
         public int? YearOfManufacture { get; set; }
         public string Area { get; set; }
@@ -28,6 +29,9 @@ namespace EBTP.Repository.Entities
         public string? Color { get; set; }
         public int? Size { get; set; }
         public int? Mass { get; set; }
+
+        public DateTime? ActivatedAt { get; set; }
+        public DateTime? ExpiredAt { get; set; }
         public ICollection<ListingImage> ListingImages { get; set; } = new List<ListingImage>();
         public StatusEnum Status { get; set; }
         [ForeignKey("BrandId")]
@@ -35,5 +39,11 @@ namespace EBTP.Repository.Entities
 
         [ForeignKey("UserId")]
         public User User { get; set; }
+        [ForeignKey("PackageId")]
+        public Package? Package { get; set; }
+        [ForeignKey("TransactionId")]
+        public Transaction? Transaction { get; set; }
+        public Payment? Payment { get; set; }
+
     }
 }
