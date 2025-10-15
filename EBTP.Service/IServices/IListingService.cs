@@ -20,5 +20,9 @@ namespace EBTP.Service.IServices
                 Task<Result<bool>> DeleteAsync(Guid id);*/
         Task<Result<string>> CreateVnPayUrlAsync(Guid listingId, HttpContext httpContext);
         Task<Result<object>> HandleVnPayReturnAsync(IQueryCollection query);
+        
+        //Admin
+        Task<Result<object>> AcceptListingAsync(Guid listingId);
+        Task<Result<object>> RejectListingAsync(Guid listingId, string? reason);
     }
 }
