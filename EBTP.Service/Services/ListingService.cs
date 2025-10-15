@@ -263,5 +263,72 @@ namespace EBTP.Service.Services
                 Data = listingId
             };
         }
+        public async Task<Result<object>> AcceptListingAsync(Guid listingId)
+        {
+            var getListing = await _unitOfWork.listingRepository.GetListingById(listingId);
+            if (getListing == null)
+            {
+                return new Result<object>()
+                {
+                    Error = 1,
+                    Message = "Không tìm thấy bài đăng",
+                    Data = null
+                };
+            }
+            if (getListing.Status == StatusEnum.Active || getListing.Status == StatusEnum.Rejected)
+            {
+                return new Result<object>()
+                {
+                    Error = 1,
+                    Message = "Bài đăng đã được xử lý",
+                    Data = null
+                };
+            }
+
+            getListing.Status = StatusEnum.Active;
+            getListing.ModificationDate = DateTime.UtcNow.AddHours(7);
+            _unitOfWork.listingRepository.Update(getListing);
+            await _unitOfWork.SaveChangeAsync();
+            return new Result<object>()
+            {
+                Error = 0,
+                Message = "Duyệt bài đăng thành công",
+                Data = null
+            };
+        }
+
+        public async Task<Result<object>> RejectListingAsync(Guid listingId, string? reason)
+        {
+            var getListing = await _unitOfWork.listingRepository.GetListingById(listingId);
+            if (getListing == null)
+            {
+                return new Result<object>()
+                {
+                    Error = 1,
+                    Message = "Không tìm thấy bài đăng",
+                    Data = null
+                };
+            }
+            if (getListing.Status == StatusEnum.Rejected  || getListing.Status == StatusEnum.Active)
+            {
+                return new Result<object>()
+                {
+                    Error = 1,
+                    Message = "Bài đăng đã được xử lý",
+                    Data = null
+                };
+            }
+
+            getListing.Status = StatusEnum.Rejected;
+            getListing.ModificationDate = DateTime.UtcNow.AddHours(7);
+            _unitOfWork.listingRepository.Update(getListing);
+            await _unitOfWork.SaveChangeAsync();
+            return new Result<object>()
+            {
+                Error = 0,
+                Message = "Từ chối bài đăng thành công",
+                Data = null
+            };
+        }
     }
 }

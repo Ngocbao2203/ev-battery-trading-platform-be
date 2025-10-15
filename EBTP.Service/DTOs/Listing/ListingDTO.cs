@@ -29,6 +29,7 @@ namespace EBTP.Service.DTOs.Listing
         public string Color { get; set; }
         public int Size { get; set; }
         public int Mass { get; set; }
+        public StatusEnum Status { get; set; }
         public List<ListingImageDTO?> ListingImages { get; set; }
         public UserDTO User { get; set; }
         public BrandDTO Brand { get; set; }
