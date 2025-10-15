@@ -1,6 +1,7 @@
 ﻿using EBTP.Service.Abstractions.Shared;
 using EBTP.Service.DTOs.Listing;
 using EBTP.Service.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -67,6 +68,13 @@ namespace EBTP.API.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+        [HttpGet("MyListings")]
+        [Authorize] // Đảm bảo user đã login
+        public async Task<ActionResult<Result<List<ListingDTO>>>> GetMyListings([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _listingService.GetMyListingsAsync(pageIndex, pageSize);
+            return result.Error == 0 ? Ok(result) : Unauthorized(result);
         }
         [HttpGet("VnpayUrl/{listingId}")]
         public async Task<IActionResult> CreateVnPayUrl(Guid listingId)
