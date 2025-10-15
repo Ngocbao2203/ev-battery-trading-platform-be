@@ -19,7 +19,7 @@ namespace EBTP.Repository.Repositories
             _context = context;
         }
 
-        public async Task<List<Listing>> GetAllListings(string? search, int pageIndex, int pageSize, decimal from, decimal to, ListingStatusEnum? listingStatusEnum, CategoryEnum? categoryEnum)
+        public async Task<List<Listing>> GetAllListings(string? search, int pageIndex, int pageSize, decimal? from, decimal? to, ListingStatusEnum? listingStatusEnum, CategoryEnum? categoryEnum)
         {
             var query = _context.Listing.AsQueryable();
 
@@ -51,7 +51,7 @@ namespace EBTP.Repository.Repositories
      .ToListAsync();
         }
 
-        public async Task<List<Listing>> GetListingsByStatus(int pageIndex, int pageSize, decimal from, decimal to, StatusEnum? status)
+        public async Task<List<Listing>> GetListingsByStatus(int pageIndex, int pageSize, decimal? from, decimal? to, StatusEnum? status)
         {
             var query = _context.Listing.AsQueryable();
 
@@ -82,6 +82,22 @@ namespace EBTP.Repository.Repositories
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             return listing;
+        }
+
+        public async Task<List<Listing>> GetListingsByUserId(Guid userId, int pageIndex, int pageSize)
+        {
+            var query = _context.Listing
+                .Where(x => x.UserId == userId && !x.IsDeleted) // Chỉ filter theo userId và IsDeleted
+                .Include(lt => lt.ListingImages)
+                .Include(lt => lt.Brand)
+                .Include(lt => lt.User)
+                .Include(lt => lt.Package);
+
+            return await query
+                .OrderByDescending(x => x.CreationDate)
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
     }
 }

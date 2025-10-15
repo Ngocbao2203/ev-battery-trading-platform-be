@@ -33,7 +33,7 @@ namespace EBTP.Service.Services
             _paymentService = paymentService;
         }
 
-        public async Task<Result<List<ListingDTO>>> GetAllAsync(string? search, int pageIndex, int pageSize, decimal from, decimal to, ListingStatusEnum? listingStatusEnum, CategoryEnum? categoryEnum)
+        public async Task<Result<List<ListingDTO>>> GetAllAsync(string? search, int pageIndex, int pageSize, decimal? from, decimal? to, ListingStatusEnum? listingStatusEnum, CategoryEnum? categoryEnum)
         {
             var result = _mapper.Map<List<ListingDTO>>(await _unitOfWork.listingRepository.GetAllListings(search, pageIndex, pageSize, from, to, listingStatusEnum, categoryEnum));
             return new Result<List<ListingDTO>>()
@@ -45,7 +45,7 @@ namespace EBTP.Service.Services
             };
         }
 
-        public async Task<Result<List<ListingDTO>>> GetListingsByStatusAsync(int pageIndex, int pageSize, decimal from, decimal to, StatusEnum? status)
+        public async Task<Result<List<ListingDTO>>> GetListingsByStatusAsync(int pageIndex, int pageSize, decimal? from, decimal? to, StatusEnum? status)
         {
             var result = _mapper.Map<List<ListingDTO>>(await _unitOfWork.listingRepository.GetListingsByStatus(pageIndex, pageSize, from, to, status));
             return new Result<List<ListingDTO>>()
@@ -75,6 +75,61 @@ namespace EBTP.Service.Services
                 Data = result
             };
         }
+
+        public async Task<Result<List<ListingDTO>>> GetMyListingsAsync(int pageIndex, int pageSize)
+        {
+            try
+            {
+                // Lấy token từ header giống CreateAsync
+                var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+                if (token == null)
+                {
+                    return new Result<List<ListingDTO>>()
+                    {
+                        Error = 1,
+                        Message = "Token not found",
+                        Data = null
+                    };
+                }
+
+                var jwtToken = new JwtSecurityTokenHandler().ReadToken(token) as JwtSecurityToken;
+
+                if (jwtToken == null)
+                {
+                    return new Result<List<ListingDTO>>()
+                    {
+                        Error = 1,
+                        Message = "Invalid token",
+                        Data = null
+                    };
+                }
+
+                var userId = Guid.Parse(jwtToken.Claims.First(claim => claim.Type == "id").Value);
+
+                // Gọi repository với userId từ token
+                var listings = await _unitOfWork.listingRepository.GetListingsByUserId(userId, pageIndex, pageSize);
+                var result = _mapper.Map<List<ListingDTO>>(listings);
+
+                return new Result<List<ListingDTO>>()
+                {
+                    Error = 0,
+                    Message = "Lấy danh sách bài đăng của bạn thành công",
+                    Count = result.Count,
+                    Data = result
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Result<List<ListingDTO>>()
+                {
+                    Error = 1,
+                    Message = $"Lỗi khi lấy danh sách bài đăng: {ex.Message}",
+                    Data = null
+                };
+            }
+        }
+
         public async Task<Result<object>> CreateAsync(CreateListingDTO createListingDTO)
         {
             try
@@ -161,41 +216,41 @@ namespace EBTP.Service.Services
             };
         }
         public async Task<Result<object>> HandleVnPayReturnAsync(IQueryCollection query)
-{
-    var listingId = Guid.Parse(query["vnp_TxnRef"]);
-
-    var listing = await _unitOfWork.listingRepository.GetListingById(listingId);
-    if (listing == null)
-    {
-        return new Result<object>
         {
-            Error = 1,
-            Message = "Không tìm thấy đơn hàng nào cho ListingId.",
-            Data = null
-        };
-    }
+            var listingId = Guid.Parse(query["vnp_TxnRef"]);
 
-    var isValid = await _paymentService.ValidateReturnData(query);
-    var responseCode = query["vnp_ResponseCode"].ToString();
-    var userId = listing.UserId;
+            var listing = await _unitOfWork.listingRepository.GetListingById(listingId);
+            if (listing == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Không tìm thấy đơn hàng nào cho ListingId.",
+                    Data = null
+                };
+            }
+
+            var isValid = await _paymentService.ValidateReturnData(query);
+            var responseCode = query["vnp_ResponseCode"].ToString();
+            var userId = listing.UserId;
 
 
-    Payment payment;
-    payment = new Payment
-    {
-        ListingId = listingId,
-        TransactionNo = query["vnp_TransactionNo"],
-        BankCode = query["vnp_BankCode"],
-        ResponseCode = responseCode,
-        SecureHash = query["vnp_SecureHash"],
-        CreatedBy = userId,
-        PaymentMethod = PaymentMethodEnum.VnPay,
-        RawData = string.Join("&", query.Select(x => $"{x.Key}={x.Value}")),
-        CreationDate = DateTime.UtcNow.AddHours(7),
-        CreatedAt = DateTime.UtcNow.AddHours(7),
-        IsDeleted = false
-    };
-    await _unitOfWork.paymentRepository.AddAsync(payment);
+            Payment payment;
+            payment = new Payment
+            {
+                ListingId = listingId,
+                TransactionNo = query["vnp_TransactionNo"],
+                BankCode = query["vnp_BankCode"],
+                ResponseCode = responseCode,
+                SecureHash = query["vnp_SecureHash"],
+                CreatedBy = userId,
+                PaymentMethod = PaymentMethodEnum.VnPay,
+                RawData = string.Join("&", query.Select(x => $"{x.Key}={x.Value}")),
+                CreationDate = DateTime.UtcNow.AddHours(7),
+                CreatedAt = DateTime.UtcNow.AddHours(7),
+                IsDeleted = false
+            };
+            await _unitOfWork.paymentRepository.AddAsync(payment);
             if (isValid && responseCode == "00")
             {
                 var getListing = await _unitOfWork.listingRepository.GetListingById(listing.Id);
@@ -309,7 +364,7 @@ namespace EBTP.Service.Services
                     Data = null
                 };
             }
-            if (getListing.Status == StatusEnum.Rejected  || getListing.Status == StatusEnum.Active)
+            if (getListing.Status == StatusEnum.Rejected || getListing.Status == StatusEnum.Active)
             {
                 return new Result<object>()
                 {
