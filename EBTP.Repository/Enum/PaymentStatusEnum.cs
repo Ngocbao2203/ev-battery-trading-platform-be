@@ -12,6 +12,7 @@ namespace EBTP.Repository.Enum
         Success,
         Failed,
         Canceled,
-        Expired
+        Expired,
+        AwaitingPayment
     }
 }
