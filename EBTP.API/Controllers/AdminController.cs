@@ -29,7 +29,7 @@ namespace EBTP.API.Controllers
         [HttpPost("Reject-Listing/{listingId}")]
         public async Task<IActionResult> RejectListing(Guid listingId, [FromQuery] string? reason)
         {
-            var result = await _listingService.AcceptListingAsync(listingId);
+            var result = await _listingService.RejectListingAsync(listingId, reason);
             if (result.Error != 0)
             {
                 return BadRequest(result);
