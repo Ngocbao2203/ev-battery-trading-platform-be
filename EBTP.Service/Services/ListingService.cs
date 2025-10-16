@@ -254,6 +254,7 @@ namespace EBTP.Service.Services
             if (isValid && responseCode == "00")
             {
                 var getListing = await _unitOfWork.listingRepository.GetListingById(listing.Id);
+                getListing.PaymentStatus = PaymentStatusEnum.Success;
                 getListing.Status = StatusEnum.Pending;
                 getListing.ModificationDate = DateTime.UtcNow.AddHours(7);
                 _unitOfWork.listingRepository.Update(getListing);
@@ -280,6 +281,7 @@ namespace EBTP.Service.Services
             {
                 listing.TransactionId = Guid.NewGuid();
                 var getListing = await _unitOfWork.listingRepository.GetListingById(listing.Id);
+                getListing.PaymentStatus = PaymentStatusEnum.Failed;
                 getListing.Status = StatusEnum.Pending;
                 getListing.ModificationDate = DateTime.UtcNow.AddHours(7);
                 _unitOfWork.listingRepository.Update(getListing);
@@ -340,8 +342,19 @@ namespace EBTP.Service.Services
                 };
             }
 
+            getListing.PaymentStatus = PaymentStatusEnum.Failed;
+            if (getListing.PaymentStatus != PaymentStatusEnum.Success)
+            {
+                return new Result<object>()
+                {
+                    Error = 1,
+                    Message = "Bài đăng chưa được thanh toán",
+                    Data = null
+                };
+            }
             getListing.Status = StatusEnum.Active;
             getListing.ModificationDate = DateTime.UtcNow.AddHours(7);
+            getListing.ExpiredAt = DateTime.UtcNow.AddHours(7).AddDays(getListing.Package.DurationInDays);
             _unitOfWork.listingRepository.Update(getListing);
             await _unitOfWork.SaveChangeAsync();
             return new Result<object>()
@@ -374,6 +387,15 @@ namespace EBTP.Service.Services
                 };
             }
 
+            if (getListing.PaymentStatus != PaymentStatusEnum.Success)
+            {
+                return new Result<object>()
+                {
+                    Error = 1,
+                    Message = "Bài đăng chưa được thanh toán",
+                    Data = null
+                };
+            }
             getListing.Status = StatusEnum.Rejected;
             getListing.ModificationDate = DateTime.UtcNow.AddHours(7);
             _unitOfWork.listingRepository.Update(getListing);

@@ -18,7 +18,7 @@ namespace EBTP.API.Controllers
             _listingService = listingService;
         }
         [HttpGet("GetAll")]
-        public async Task<IActionResult> GetAll([FromQuery] string? search, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, [FromQuery] decimal from = 0, [FromQuery] decimal to = decimal.MaxValue, [FromQuery] EBTP.Repository.Enum.ListingStatusEnum? listingStatusEnum = null, [FromQuery] EBTP.Repository.Enum.CategoryEnum? categoryEnum = null)
+        public async Task<IActionResult> GetAll([FromQuery] string? search, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, [FromQuery] decimal? from = null, [FromQuery] decimal? to = null, [FromQuery] EBTP.Repository.Enum.ListingStatusEnum? listingStatusEnum = null, [FromQuery] EBTP.Repository.Enum.CategoryEnum? categoryEnum = null)
         {
             var result = await _listingService.GetAllAsync(search, pageIndex, pageSize, from, to, listingStatusEnum, categoryEnum);
             if (result.Error != 0)
@@ -29,7 +29,7 @@ namespace EBTP.API.Controllers
         }
 
         [HttpGet("GetByStatus")]
-        public async Task<IActionResult> GetByStatus([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, [FromQuery] decimal from = 0, [FromQuery] decimal to = decimal.MaxValue, [FromQuery] EBTP.Repository.Enum.StatusEnum? status = null)
+        public async Task<IActionResult> GetByStatus([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, [FromQuery] decimal? from = null, [FromQuery] decimal? to = null, [FromQuery] EBTP.Repository.Enum.StatusEnum? status = null)
         {
             var result = await _listingService.GetListingsByStatusAsync(pageIndex, pageSize, from, to, status);
             if (result.Error != 0)

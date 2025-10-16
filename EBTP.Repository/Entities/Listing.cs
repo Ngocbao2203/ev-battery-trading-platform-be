@@ -33,6 +33,7 @@ namespace EBTP.Repository.Entities
         public DateTime? ActivatedAt { get; set; }
         public DateTime? ExpiredAt { get; set; }
         public ICollection<ListingImage> ListingImages { get; set; } = new List<ListingImage>();
+        public PaymentStatusEnum PaymentStatus { get; set; } = PaymentStatusEnum.AwaitingPayment;
         public StatusEnum Status { get; set; }
         [ForeignKey("BrandId")]
         public Brand Brand { get; set; }
