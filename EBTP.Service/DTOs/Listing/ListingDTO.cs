@@ -34,5 +34,6 @@ namespace EBTP.Service.DTOs.Listing
         public UserDTO User { get; set; }
         public BrandDTO Brand { get; set; }
         public PackageDTO Package { get; set; }
+        public PaymentStatusEnum PaymentStatus { get; set; }
     }
 }

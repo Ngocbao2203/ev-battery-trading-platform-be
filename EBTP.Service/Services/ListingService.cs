@@ -342,7 +342,7 @@ namespace EBTP.Service.Services
                 };
             }
 
-            getListing.PaymentStatus = PaymentStatusEnum.Failed;
+            
             if (getListing.PaymentStatus != PaymentStatusEnum.Success)
             {
                 return new Result<object>()
@@ -354,6 +354,7 @@ namespace EBTP.Service.Services
             }
             getListing.Status = StatusEnum.Active;
             getListing.ModificationDate = DateTime.UtcNow.AddHours(7);
+            getListing.ActivatedAt = DateTime.UtcNow.AddHours(7);
             getListing.ExpiredAt = DateTime.UtcNow.AddHours(7).AddDays(getListing.Package.DurationInDays);
             _unitOfWork.listingRepository.Update(getListing);
             await _unitOfWork.SaveChangeAsync();
