@@ -35,5 +35,8 @@ namespace EBTP.Service.DTOs.Listing
         public BrandDTO Brand { get; set; }
         public PackageDTO Package { get; set; }
         public PaymentStatusEnum PaymentStatus { get; set; }
+        public DateTime? ActivatedAt { get; set; }
+        public DateTime? ExpiredAt { get; set; }
+        public DateTime CreationDate { get; set; }
     }
 }
