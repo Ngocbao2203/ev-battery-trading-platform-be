@@ -369,6 +369,7 @@ namespace EBTP.Service.Services
         public async Task<Result<object>> RejectListingAsync(Guid listingId, string? reason)
         {
             var getListing = await _unitOfWork.listingRepository.GetListingById(listingId);
+
             if (getListing == null)
             {
                 return new Result<object>()
