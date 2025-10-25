@@ -10,6 +10,7 @@ namespace EBTP.Repository.Enum
     {
         ElectricCar,
         ElectricMotorbike,
-        RemovableBattery
+        RemovableBattery,
+        Free
     }
 }

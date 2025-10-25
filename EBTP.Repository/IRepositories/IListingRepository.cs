@@ -14,5 +14,6 @@ namespace EBTP.Repository.IRepositories
         Task<List<Listing>> GetListingsByStatus(int pageIndex, int pageSize, decimal? from, decimal? to, StatusEnum? status);
         Task<Listing> GetListingById(Guid id);
         Task<List<Listing>> GetListingsByUserId(Guid userId, int pageIndex, int pageSize);
+        Task<bool> CheckIsFirstListing(Guid userId);
     }
 }

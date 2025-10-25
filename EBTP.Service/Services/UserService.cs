@@ -101,5 +101,15 @@ namespace EBTP.Service.Services
                 };
             }
         }
+        public async Task<Result<List<UserDTO>>> GetAllUsers(int pageIndex, int pageSize)
+        {
+            var result = _mapper.Map<List<UserDTO>>(await _unitOfWork.userRepository.GetAllUsers(pageIndex, pageSize));
+            return new Result<List<UserDTO>>()
+            {
+                Error = 0,
+                Message = "Lấy danh sách thông tin người dùng thành công",
+                Data = result
+            };
+        }
     }
 }

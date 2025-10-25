@@ -67,5 +67,19 @@ namespace EBTP.Repository.Repositories
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Id == userId);
         }
+        public async Task<List<User>> GetAllUsers(int pageIndex, int pageSize)
+        {
+            var query = _context.User
+                .Include(u => u.Listings)
+                .Include(u => u.Role)
+                .Where(u => u.RoleId == 2)
+                .AsQueryable();
+
+            query = query.OrderByDescending(u => u.CreationDate);
+
+            query = query.Skip((pageIndex - 1) * pageSize).Take(pageSize);
+
+            return await query.ToListAsync();
+        }
     }
 }

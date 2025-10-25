@@ -14,7 +14,7 @@ namespace EBTP.Service.DTOs.Package
         [MaxLength(50, ErrorMessage = "Tên gói phải ít hơn 50 ký tự.")]
         public string Name { get; set; }
         [Required(ErrorMessage = "Giá gói là bắt buộc.")]
-        [Range(typeof(decimal), "1", "79228162514264337593543950335", ErrorMessage = "Giá phải lớn hơn bằng 0.")]
+        [Range(typeof(decimal), "0", "79228162514264337593543950335", ErrorMessage = "Giá phải lớn hơn bằng 0.")]
         public decimal Price { get; set; }
         [Required(ErrorMessage = "Thời gian hiệu lực của gói là bắt buộc.")]
         [Range(0, int.MaxValue, ErrorMessage = "Thời gian hiệu lực của gói phải lớn hơn 0.")]

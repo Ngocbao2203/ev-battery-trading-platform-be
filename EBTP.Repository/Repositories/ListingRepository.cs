@@ -115,5 +115,10 @@ namespace EBTP.Repository.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
+        public async Task<bool> CheckIsFirstListing(Guid userId)
+        {
+            return !await _context.Listing
+                .AnyAsync(l => l.UserId == userId && l.Package.PackageType == PackageTypeEnum.Free);
+        }
     }
 }
