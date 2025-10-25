@@ -18,5 +18,6 @@ namespace EBTP.Repository.IRepositories
         Task UpdateAsync(User user);
         Task AddAsync(User user);
         Task<User> GetUserById(Guid userId);
+        Task<List<User>> GetAllUsers(int pageIndex, int pageSize);
     }
 }

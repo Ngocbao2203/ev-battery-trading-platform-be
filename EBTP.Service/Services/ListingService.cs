@@ -145,7 +145,17 @@ namespace EBTP.Service.Services
                     return new Result<object>() { Error = 1, Message = "Invalid token", Data = null };
                 var userId = Guid.Parse(jwtToken.Claims.First(claim => claim.Type == "id").Value);
                 var listing = _mapper.Map<Listing>(createListingDTO);
-
+                var canUseFree = await _unitOfWork.listingRepository.CheckIsFirstListing(userId);
+                var package = await _unitOfWork.packageRepository.GetByIdAsync((Guid)createListingDTO.PackageId);
+                if (package.PackageType == PackageTypeEnum.Free && !canUseFree)
+                {
+                    return new Result<object>()
+                    {
+                        Error = 1,
+                        Message = "Chỉ được tạo một bài đăng miễn phí.",
+                        Data = null
+                    };
+                }
                 if (createListingDTO.ListingImages != null && createListingDTO.ListingImages.Count > 5)
                 {
                     return new Result<object>
@@ -342,15 +352,17 @@ namespace EBTP.Service.Services
                 };
             }
 
-            getListing.PaymentStatus = PaymentStatusEnum.Failed;
-            if (getListing.PaymentStatus != PaymentStatusEnum.Success)
+            if (getListing.Package.PackageType != PackageTypeEnum.Free)
             {
-                return new Result<object>()
+                if (getListing.PaymentStatus != PaymentStatusEnum.Success)
                 {
-                    Error = 1,
-                    Message = "Bài đăng chưa được thanh toán",
-                    Data = null
-                };
+                    return new Result<object>()
+                    {
+                        Error = 1,
+                        Message = "Bài đăng chưa được thanh toán",
+                        Data = null
+                    };
+                }
             }
             getListing.Status = StatusEnum.Active;
             getListing.ModificationDate = DateTime.UtcNow.AddHours(7);
@@ -387,14 +399,17 @@ namespace EBTP.Service.Services
                 };
             }
 
-            if (getListing.PaymentStatus != PaymentStatusEnum.Success)
+            if (getListing.Package.PackageType != PackageTypeEnum.Free)
             {
-                return new Result<object>()
+                if (getListing.PaymentStatus != PaymentStatusEnum.Success)
                 {
-                    Error = 1,
-                    Message = "Bài đăng chưa được thanh toán",
-                    Data = null
-                };
+                    return new Result<object>()
+                    {
+                        Error = 1,
+                        Message = "Bài đăng chưa được thanh toán",
+                        Data = null
+                    };
+                }
             }
             getListing.Status = StatusEnum.Rejected;
             getListing.ModificationDate = DateTime.UtcNow.AddHours(7);
