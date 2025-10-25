@@ -28,7 +28,15 @@ namespace EBTP.Repository.Repositories
                 query = query.Where(x => x.Title.Contains(search));
             }
 
-            query = query.Where(x => x.Price >= from && x.Price <= to);
+            if (from.HasValue)
+            {
+                query = query.Where(x => x.Price >= from.Value);
+            }
+
+            if (to.HasValue)
+            {
+                query = query.Where(x => x.Price <= to.Value);
+            }
             if (listingStatusEnum.HasValue)
             {
                 query = query.Where(x => x.ListingStatus == listingStatusEnum.Value);
@@ -53,9 +61,17 @@ namespace EBTP.Repository.Repositories
 
         public async Task<List<Listing>> GetListingsByStatus(int pageIndex, int pageSize, decimal? from, decimal? to, StatusEnum? status)
         {
-            var query = _context.Listing.AsQueryable();
+             var query = _context.Listing.AsQueryable();
 
-            query = query.Where(x => x.Price >= from && x.Price <= to);
+            if (from.HasValue)
+            {
+                query = query.Where(x => x.Price >= from.Value);
+            }
+
+            if (to.HasValue)
+            {
+                query = query.Where(x => x.Price <= to.Value);
+            }
 
             if (status.HasValue)
             {
