@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EBTP.Repository.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,5 +11,6 @@ namespace EBTP.Service.DTOs.Brand
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public BrandTypeEnum Type { get; set; }
     }
 }

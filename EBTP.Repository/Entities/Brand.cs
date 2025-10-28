@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EBTP.Repository.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -11,5 +12,7 @@ namespace EBTP.Repository.Entities
     {
         public string Name { get; set; }
         public ICollection<Listing> Listings { get; set; }
+
+        public BrandTypeEnum Type { get; set; }
     }
 }
