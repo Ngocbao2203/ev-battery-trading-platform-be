@@ -69,6 +69,25 @@ namespace EBTP.API.Controllers
             }
             return Ok(result);
         }
+        [HttpPut("UpdateListing")]
+        public async Task<IActionResult> UpdateListing([FromForm] UpdateListingDTO updateListingDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new Result<object>
+                {
+                    Error = 1,
+                    Message = "Dữ liệu không hợp lệ.",
+                    Data = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                });
+            }
+            var result = await _listingService.UpdateAsync(updateListingDTO);
+            if (result.Error != 0)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
         [HttpGet("MyListings")]
         [Authorize] // Đảm bảo user đã login
         public async Task<ActionResult<Result<List<ListingDTO>>>> GetMyListings([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)

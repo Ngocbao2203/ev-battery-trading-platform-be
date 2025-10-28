@@ -37,10 +37,6 @@ namespace EBTP.Repository.Repositories
             {
                 query = query.Where(x => x.Price <= to.Value);
             }
-            if (listingStatusEnum.HasValue)
-            {
-                query = query.Where(x => x.ListingStatus == listingStatusEnum.Value);
-            }
 
             if (categoryEnum.HasValue)
             {
@@ -48,15 +44,15 @@ namespace EBTP.Repository.Repositories
             }
 
             return await query
-     .Include(lt => lt.ListingImages)
-     .Include(lt => lt.Brand)
-     .Include(lt => lt.User)
-     .Include(lt => lt.Package)
-     .Where(x => x.Status == StatusEnum.Active && !x.IsDeleted)
-     .OrderByDescending(x => x.CreationDate)
-     .Skip((pageIndex - 1) * pageSize)
-     .Take(pageSize)
-     .ToListAsync();
+                .Include(lt => lt.ListingImages)
+                .Include(lt => lt.Brand)
+                .Include(lt => lt.User)
+                .Include(lt => lt.Package)
+                .Where(x => x.Status == StatusEnum.Active && !x.IsDeleted)
+                .OrderByDescending(x => x.CreationDate)
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
 
         public async Task<List<Listing>> GetListingsByStatus(int pageIndex, int pageSize, decimal? from, decimal? to, StatusEnum? status)

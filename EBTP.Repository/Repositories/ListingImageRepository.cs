@@ -11,9 +11,15 @@ namespace EBTP.Repository.Repositories
 {
     public class ListingImageRepository : GenericRepository<ListingImage>, IListingImageRepository
     {
+        private readonly AppDbContext _dbContext;
         public ListingImageRepository(AppDbContext context) : base(context)
         {
+            _dbContext = context;
         }
-
+        public async Task RemoveImage(ListingImage listingImage)
+        {
+            _dbContext.ListingImage.Remove(listingImage);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

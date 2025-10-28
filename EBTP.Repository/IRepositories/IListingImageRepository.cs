@@ -9,5 +9,6 @@ namespace EBTP.Repository.IRepositories
 {
     public interface IListingImageRepository : IGenericRepository<ListingImage>
     {
+        Task RemoveImage(ListingImage listingImage);
     }
 }

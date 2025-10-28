@@ -424,5 +424,86 @@ namespace EBTP.Service.Services
                 Data = null
             };
         }
+        public async Task<Result<ListingDTO>> UpdateAsync(UpdateListingDTO updateListingDTO)
+        {
+            try
+            {
+                var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                if (token == null)
+                    return new Result<ListingDTO>() { Error = 1, Message = "Token not found", Data = null };
+
+                var jwtToken = new JwtSecurityTokenHandler().ReadToken(token) as JwtSecurityToken;
+                if (jwtToken == null)
+                    return new Result<ListingDTO>() { Error = 1, Message = "Invalid token", Data = null };
+
+                var userId = Guid.Parse(jwtToken.Claims.First(claim => claim.Type == "id").Value);
+
+                var listing = await _unitOfWork.listingRepository.GetByIdAsync(updateListingDTO.Id);
+                if (listing == null)
+                {
+                    return new Result<ListingDTO>
+                    {
+                        Error = 1,
+                        Message = "Listing không tồn tại"
+                    };
+                }
+
+                if (listing.UserId != userId)
+                {
+                    return new Result<ListingDTO>
+                    {
+                        Error = 1,
+                        Message = "Bạn không có quyền sửa bài đăng này"
+                    };
+                }
+
+                listing.ListingImages ??= new List<ListingImage>();
+                if (updateListingDTO.ImagesToAdd?.Any() == true)
+                {
+                    foreach (var image in updateListingDTO.ImagesToAdd)
+                    {
+                        var uploadResult = await _cloudinaryService.UploadProductImage(image, FOLDER);
+                        if (uploadResult != null)
+                        {
+                            listing.ListingImages.Add(new ListingImage
+                            {
+                                ImageUrl = uploadResult.SecureUrl.ToString()
+                            });
+                        }
+                    }
+                }
+                if (updateListingDTO.ImagesToRemove?.Any() == true)
+                {
+                    var imagesToMove = listing.ListingImages
+                        .Where(i => updateListingDTO.ImagesToRemove.Contains(i.Id))
+                        .ToList();
+                    foreach (var image in imagesToMove)
+                    {
+                        await _cloudinaryService.DeleteImageAsync(image.ImageUrl);
+                        await _unitOfWork.listingImageRepository.RemoveImage(image);
+                    }
+                }
+                listing.Status = StatusEnum.Pending;
+
+                _unitOfWork.listingRepository.Update(listing);
+                await _unitOfWork.SaveChangeAsync();
+
+                return new Result<ListingDTO>()
+                {
+                    Error = 0,
+                    Message = "Cập nhật bài đăng thành công",
+                    Data = null
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Result<ListingDTO>()
+                {
+                    Error = 1,
+                    Message = ex.Message,
+                    Data = null
+                };
+            }
+        }
     }
 }
