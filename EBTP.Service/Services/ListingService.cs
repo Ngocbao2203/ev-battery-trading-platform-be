@@ -438,7 +438,7 @@ namespace EBTP.Service.Services
 
                 var userId = Guid.Parse(jwtToken.Claims.First(claim => claim.Type == "id").Value);
 
-                var listing = await _unitOfWork.listingRepository.GetByIdAsync(updateListingDTO.Id);
+                var listing = await _unitOfWork.listingRepository.GetListingById(updateListingDTO.Id);
                 if (listing == null)
                 {
                     return new Result<ListingDTO>
