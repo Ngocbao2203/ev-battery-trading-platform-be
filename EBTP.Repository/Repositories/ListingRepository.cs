@@ -116,5 +116,17 @@ namespace EBTP.Repository.Repositories
             return !await _context.Listing
                 .AnyAsync(l => l.UserId == userId && l.Package.PackageType == PackageTypeEnum.Free);
         }
+        public async Task<List<Listing>> CheckListingExpired()
+        {
+            var now = DateTime.UtcNow.AddHours(7);
+
+            var expiredListings = await _context.Listing
+                .Where(x => x.ExpiredAt.HasValue
+                        && x.ExpiredAt.Value < now
+                        && x.Status != StatusEnum.Expired)
+                .ToListAsync();
+
+            return expiredListings;
+        }
     }
 }

@@ -1,11 +1,14 @@
-using EBTP.Repository.Data;
+﻿using EBTP.Repository.Data;
 using EBTP.Repository.IRepositories;
 using EBTP.Repository.Repositories;
 using EBTP.Service.Abstractions.CloudinaryService;
 using EBTP.Service.Abstractions.PaymentService;
 using EBTP.Service.IServices;
+using EBTP.Service.Jobs;
 using EBTP.Service.Mappers;
 using EBTP.Service.Services;
+using Hangfire;
+using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -74,6 +77,24 @@ builder.Services.AddSwaggerGen(c =>
             });
 
 });
+// Add Hangfire server
+builder.Services.AddHangfire(config =>
+{
+    config.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+          .UseSimpleAssemblyNameTypeSerializer()
+          .UseRecommendedSerializerSettings()
+          .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"), new SqlServerStorageOptions
+          {
+              CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+              SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+              QueuePollInterval = TimeSpan.Zero,
+              UseRecommendedIsolationLevel = true,
+              DisableGlobalLocks = true
+          });
+});
+
+// Add Hangfire server
+builder.Services.AddHangfireServer();
 
 builder.Services.AddAuthorization(options =>
 {
@@ -180,6 +201,9 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 
 app.UseAuthorization();
+app.UseHangfireDashboard();
+// Đăng ký recurring job
+HangfireJobs.RegisterJobs();
 
 app.MapControllers();
 

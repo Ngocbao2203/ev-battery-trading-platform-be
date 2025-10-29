@@ -26,5 +26,8 @@ namespace EBTP.Service.IServices
         Task<Result<object>> AcceptListingAsync(Guid listingId);
         Task<Result<object>> RejectListingAsync(Guid listingId, string? reason);
         Task<Result<ListingDTO>> UpdateAsync(UpdateListingDTO updateListingDTO);
+        
+        //Hangfire
+        Task AutoChangeStatusWhenListingExpiredAsync();
     }
 }

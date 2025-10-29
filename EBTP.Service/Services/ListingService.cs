@@ -58,7 +58,7 @@ namespace EBTP.Service.Services
         }
         public async Task<Result<ListingDTO>> GetByIdAsync(Guid id)
         {
-            var result = _mapper.Map<ListingDTO>(await _unitOfWork.listingRepository.GetByIdAsync(id));
+            var result = _mapper.Map<ListingDTO>(await _unitOfWork.listingRepository.GetListingById(id));
             if (result == null)
             {
                 return new Result<ListingDTO>()
@@ -438,7 +438,7 @@ namespace EBTP.Service.Services
 
                 var userId = Guid.Parse(jwtToken.Claims.First(claim => claim.Type == "id").Value);
 
-                var listing = await _unitOfWork.listingRepository.GetByIdAsync(updateListingDTO.Id);
+                var listing = await _unitOfWork.listingRepository.GetListingById(updateListingDTO.Id);
                 if (listing == null)
                 {
                     return new Result<ListingDTO>
@@ -504,6 +504,20 @@ namespace EBTP.Service.Services
                     Data = null
                 };
             }
+        }
+        //Hangfire
+        public async Task AutoChangeStatusWhenListingExpiredAsync()
+        {
+            var expiredListings = await _unitOfWork.listingRepository.CheckListingExpired();
+            if (!expiredListings.Any())
+                return;
+
+            foreach (var listing in expiredListings)
+            {
+                listing.Status = StatusEnum.Expired;
+            }
+
+            await _unitOfWork.SaveChangeAsync();
         }
     }
 }
