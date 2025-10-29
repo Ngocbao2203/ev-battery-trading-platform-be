@@ -11,6 +11,7 @@ namespace EBTP.Repository.Enum
         Pending,
         Active,
         Inactive,
-        Rejected
+        Rejected,
+        Expired
     }
 }
