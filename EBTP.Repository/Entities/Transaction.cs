@@ -14,19 +14,24 @@ namespace EBTP.Repository.Entities
         public Guid ListingId { get; set; }
         public Guid PackageId { get; set; }
         public Guid? PaymentId { get; set; }
-        public decimal Amount { get; set; }
-        public string Currency { get; set; }
-        public DateTime TransactionDate { get; set; }
-        public string Notes { get; set; }
-        public PaymentStatusEnum Status { get; set; } = PaymentStatusEnum.Pending;
-        public string PaymentMethod { get; set; }
 
-        [ForeignKey("ListingId")]
+        public decimal Amount { get; set; }
+        public string Currency { get; set; } = "VND";
+        public DateTime TransactionDate { get; set; } = DateTime.UtcNow.AddHours(7);
+        public string? Notes { get; set; }
+        public PaymentStatusEnum Status { get; set; } = PaymentStatusEnum.Pending;
+        public string? PaymentMethod { get; set; }
+
+        [ForeignKey(nameof(ListingId))]
         public Listing Listing { get; set; } = null!;
-        [ForeignKey("PackageId")]
+
+        [ForeignKey(nameof(PackageId))]
         public Package Package { get; set; } = null!;
-        [ForeignKey("UserId")]
+
+        [ForeignKey(nameof(UserId))]
         public User User { get; set; } = null!;
+
+        [ForeignKey(nameof(PaymentId))]
         public Payment? Payment { get; set; }
     }
 }

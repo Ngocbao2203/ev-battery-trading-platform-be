@@ -9,5 +9,6 @@ namespace EBTP.Repository.IRepositories
 {
     public interface IPaymentRepository : IGenericRepository<Payment>
     {
+        Task<Payment?> GetByTransactionNoAsync(string transactionNo);
     }
 }

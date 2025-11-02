@@ -16,6 +16,8 @@ namespace EBTP.Repository.IRepositories
         IListingImageRepository listingImageRepository { get; }
         ITransactionRepository transactionRepository { get; }
         IPaymentRepository paymentRepository { get; }
+        IFavouriteRepository favouriteRepository { get; }
+        IReportRepository reportRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

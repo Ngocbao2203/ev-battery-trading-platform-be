@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EBTP.Repository.Migrations
 {
     /// <inheritdoc />
-    public partial class addtransationtable : Migration
+    public partial class upreturnpayment : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,6 +19,7 @@ namespace EBTP.Repository.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -136,9 +137,12 @@ namespace EBTP.Repository.Migrations
                     Color = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Size = table.Column<int>(type: "int", nullable: true),
                     Mass = table.Column<int>(type: "int", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ResonReject = table.Column<int>(type: "int", nullable: true),
+                    DescriptionReject = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentStatus = table.Column<int>(type: "int", nullable: false),
                     ActivatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ExpiredAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -165,6 +169,38 @@ namespace EBTP.Repository.Migrations
                         column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Favourite",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ListingId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModificationBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeletionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Favourite", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Favourite_Listing_ListingId",
+                        column: x => x.ListingId,
+                        principalTable: "Listing",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Favourite_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -198,7 +234,6 @@ namespace EBTP.Repository.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ListingId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TransactionNo = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BankCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ResponseCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -206,6 +241,7 @@ namespace EBTP.Repository.Migrations
                     PaymentMethod = table.Column<int>(type: "int", nullable: false),
                     RawData = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsRefunded = table.Column<bool>(type: "bit", nullable: false),
+                    ListingId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -222,6 +258,39 @@ namespace EBTP.Repository.Migrations
                         name: "FK_Payment_Listing_ListingId",
                         column: x => x.ListingId,
                         principalTable: "Listing",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Report",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ListingId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Reason = table.Column<int>(type: "int", nullable: false),
+                    OtherReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModificationBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeletionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Report", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Report_Listing_ListingId",
+                        column: x => x.ListingId,
+                        principalTable: "Listing",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Report_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -238,9 +307,9 @@ namespace EBTP.Repository.Migrations
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TransactionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -286,6 +355,25 @@ namespace EBTP.Repository.Migrations
                     { 2, "User" }
                 });
 
+            migrationBuilder.InsertData(
+                table: "User",
+                columns: new[] { "Id", "CreatedBy", "CreationDate", "DateOfBirth", "DeleteBy", "DeletionDate", "Email", "IsDeleted", "IsVerified", "ModificationBy", "ModificationDate", "Otp", "OtpExpiryTime", "PasswordHash", "PhoneNumber", "Provider", "ProviderKey", "RefreshToken", "ResetToken", "ResetTokenExpiry", "RoleId", "Status", "Thumbnail", "UserName", "VerificationToken" },
+                values: new object[,]
+                {
+                    { new Guid("8b56687e-8377-4743-aac9-08dcf5c4b471"), null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, null, "admin@gmail.com", false, true, null, null, null, null, "$2y$10$O1smXu1TdT1x.Z35v5jQauKcQIBn85VYRqiLggPD8HMF9rRyGnHXy", "0123456789", null, null, null, null, null, 1, 1, null, "Admin", null },
+                    { new Guid("8b56687e-8377-4743-aac9-08dcf5c4b47f"), null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, null, "staff@gmail.com", false, true, null, null, null, null, "$2y$10$O1smXu1TdT1x.Z35v5jQauKcQIBn85VYRqiLggPD8HMF9rRyGnHXy", "0123456789", null, null, null, null, null, 2, 1, null, "Staff", null }
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Favourite_ListingId",
+                table: "Favourite",
+                column: "ListingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Favourite_UserId",
+                table: "Favourite",
+                column: "UserId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Listing_BrandId",
                 table: "Listing",
@@ -295,11 +383,6 @@ namespace EBTP.Repository.Migrations
                 name: "IX_Listing_PackageId",
                 table: "Listing",
                 column: "PackageId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Listing_TransactionId",
-                table: "Listing",
-                column: "TransactionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Listing_UserId",
@@ -314,7 +397,17 @@ namespace EBTP.Repository.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Payment_ListingId",
                 table: "Payment",
-                column: "ListingId",
+                column: "ListingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Report_ListingId",
+                table: "Report",
+                column: "ListingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Report_UserId_ListingId",
+                table: "Report",
+                columns: new[] { "UserId", "ListingId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -341,42 +434,19 @@ namespace EBTP.Repository.Migrations
                 name: "IX_User_RoleId",
                 table: "User",
                 column: "RoleId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Listing_Transaction_TransactionId",
-                table: "Listing",
-                column: "TransactionId",
-                principalTable: "Transaction",
-                principalColumn: "Id");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Listing_Brand_BrandId",
-                table: "Listing");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Listing_Package_PackageId",
-                table: "Listing");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Transaction_Package_PackageId",
-                table: "Transaction");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Listing_Transaction_TransactionId",
-                table: "Listing");
+            migrationBuilder.DropTable(
+                name: "Favourite");
 
             migrationBuilder.DropTable(
                 name: "ListingImage");
 
             migrationBuilder.DropTable(
-                name: "Brand");
-
-            migrationBuilder.DropTable(
-                name: "Package");
+                name: "Report");
 
             migrationBuilder.DropTable(
                 name: "Transaction");
@@ -386,6 +456,12 @@ namespace EBTP.Repository.Migrations
 
             migrationBuilder.DropTable(
                 name: "Listing");
+
+            migrationBuilder.DropTable(
+                name: "Brand");
+
+            migrationBuilder.DropTable(
+                name: "Package");
 
             migrationBuilder.DropTable(
                 name: "User");

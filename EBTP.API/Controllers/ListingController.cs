@@ -101,7 +101,12 @@ namespace EBTP.API.Controllers
             var result = await _listingService.CreateVnPayUrlAsync(listingId, HttpContext);
             return StatusCode(result.Error == 0 ? 200 : 400, result);
         }
-
+        [HttpGet("Repayment/{listingId}")]
+        public async Task<IActionResult> Repayment(Guid listingId)
+        {
+            var result = await _listingService.RetryPayment(listingId, HttpContext);
+            return StatusCode(result.Error == 0 ? 200 : 400, result);
+        }
         [HttpGet("vnpay-return")]
         public async Task<IActionResult> VnPayReturn()
         {

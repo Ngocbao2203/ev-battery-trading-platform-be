@@ -21,6 +21,9 @@ namespace EBTP.Repository.Data
         public DbSet<Listing> Listing { get; set; }
         public DbSet<ListingImage> ListingImage { get; set; }
         public DbSet<Package> Package { get; set; }
+        public DbSet<Report> Report { get; set; }
+        public DbSet<Favourite> Favourite { get; set; }
+        public DbSet<Payment> Payment { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -29,6 +32,35 @@ namespace EBTP.Repository.Data
                new Role { Id = 1, RoleName = "Admin" },
                new Role { Id = 2, RoleName = "User" }
             );
+            modelBuilder.Entity<User>().HasData(
+     new User
+     {
+         Id = Guid.Parse("8B56687E-8377-4743-AAC9-08DCF5C4B471"),
+         UserName = "Admin",
+         Email = "admin@gmail.com",
+         PasswordHash = "$2y$10$O1smXu1TdT1x.Z35v5jQauKcQIBn85VYRqiLggPD8HMF9rRyGnHXy",
+         Status = StatusEnum.Active,
+         RoleId = 1,
+         IsVerified = true,
+         PhoneNumber = "0123456789",
+         CreationDate = new DateTime(2024, 01, 01, 00, 00, 00, DateTimeKind.Utc),
+         IsDeleted = false
+     },
+     new User
+     {
+         Id = Guid.Parse("8B56687E-8377-4743-AAC9-08DCF5C4B47F"),
+         UserName = "Staff",
+         Email = "staff@gmail.com",
+         PasswordHash = "$2y$10$O1smXu1TdT1x.Z35v5jQauKcQIBn85VYRqiLggPD8HMF9rRyGnHXy",
+         Status = StatusEnum.Active,
+         RoleId = 2,
+         IsVerified = true,
+         PhoneNumber = "0123456789",
+         CreationDate = new DateTime(2024, 01, 01, 00, 00, 00, DateTimeKind.Utc),
+         IsDeleted = false
+     }
+ );
+
             //Brand
             modelBuilder.Entity<Brand>(e =>
             {

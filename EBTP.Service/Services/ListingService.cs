@@ -6,6 +6,7 @@ using EBTP.Service.Abstractions.Shared;
 using EBTP.Service.DTOs.Listing;
 using EBTP.Service.IServices;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -216,8 +217,25 @@ namespace EBTP.Service.Services
             }
 
             var totalAmount = listing.Package.Price;
+            var transactionNo = Guid.NewGuid().ToString("N");
 
-            var url = await _paymentService.CreatePaymentUrl(listingId, totalAmount, httpContext);
+            var payment = new Payment
+            {
+                Id = Guid.NewGuid(),
+                TransactionNo = transactionNo,
+                ListingId = listingId,
+                CreatedBy = listing.UserId,
+                PaymentMethod = PaymentMethodEnum.VnPay,
+                CreationDate = DateTime.UtcNow.AddHours(7),
+                CreatedAt = DateTime.UtcNow.AddHours(7),
+                IsDeleted = false
+            };
+
+            await _unitOfWork.paymentRepository.AddAsync(payment);
+            await _unitOfWork.SaveChangeAsync();
+
+            var url = await _paymentService.CreatePaymentUrl(transactionNo, totalAmount, httpContext);
+
             return new Result<string>()
             {
                 Error = 0,
@@ -225,54 +243,127 @@ namespace EBTP.Service.Services
                 Data = url
             };
         }
-        public async Task<Result<object>> HandleVnPayReturnAsync(IQueryCollection query)
+        public async Task<Result<string>> RetryPayment(Guid listingId, HttpContext httpContext)
         {
-            var listingId = Guid.Parse(query["vnp_TxnRef"]);
-
             var listing = await _unitOfWork.listingRepository.GetListingById(listingId);
             if (listing == null)
+            {
+                return new Result<string>
+                {
+                    Error = 1,
+                    Message = "Không tìm thấy bài đăng.",
+                    Data = null
+                };
+            }
+
+            if (listing.Status != StatusEnum.Expired)
+            {
+                return new Result<string>
+                {
+                    Error = 1,
+                    Message = "Bài đăng chưa hết hạn, không thể thanh toán lại.",
+                    Data = null
+                };
+            }
+
+            var package = await _unitOfWork.packageRepository.GetByIdAsync((Guid)listing.PackageId);
+            if (package == null)
+            {
+                return new Result<string>
+                {
+                    Error = 1,
+                    Message = "Không tìm thấy gói đăng của bài viết.",
+                    Data = null
+                };
+            }
+
+            var totalAmount = package.Price;
+            var transactionNo = Guid.NewGuid().ToString("N"); // ✅ mã mới hoàn toàn
+
+            var payment = new Payment
+            {
+                Id = Guid.NewGuid(),
+                TransactionNo = transactionNo,
+                ListingId = listingId,
+                CreatedBy = listing.UserId,
+                PaymentMethod = PaymentMethodEnum.VnPay,
+                CreationDate = DateTime.UtcNow.AddHours(7),
+                CreatedAt = DateTime.UtcNow.AddHours(7),
+                IsDeleted = false
+            }; await _unitOfWork.paymentRepository.AddAsync(payment);
+            await _unitOfWork.SaveChangeAsync();
+
+            var url = await _paymentService.CreatePaymentUrl(transactionNo, totalAmount, httpContext);
+
+            return new Result<string>
+            {
+                Error = 0,
+                Message = "Tạo URL thanh toán lại thành công.",
+                Data = url
+            };
+        }
+        public async Task<Result<object>> HandleVnPayReturnAsync(IQueryCollection query)
+        {
+            var transactionNo = query["vnp_TxnRef"].ToString();
+            if (string.IsNullOrEmpty(transactionNo))
             {
                 return new Result<object>
                 {
                     Error = 1,
-                    Message = "Không tìm thấy đơn hàng nào cho ListingId.",
+                    Message = "Mã giao dịch không hợp lệ.",
+                    Data = null
+                };
+            }
+
+            var payment = await _unitOfWork.paymentRepository
+                .GetByTransactionNoAsync(transactionNo);
+
+            if (payment == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Không tìm thấy giao dịch thanh toán tương ứng.",
                     Data = null
                 };
             }
 
             var isValid = await _paymentService.ValidateReturnData(query);
             var responseCode = query["vnp_ResponseCode"].ToString();
+
+            payment.BankCode = query["vnp_BankCode"];
+            payment.ResponseCode = responseCode;
+            payment.SecureHash = query["vnp_SecureHash"];
+            payment.RawData = string.Join("&", query.Select(x => $"{x.Key}={x.Value}"));
+            payment.ModificationDate = DateTime.UtcNow.AddHours(7);
+            _unitOfWork.paymentRepository.Update(payment);
+
+            var listing = await _unitOfWork.listingRepository.GetListingById((Guid)payment.ListingId);
+
+            if (listing == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Không tìm thấy bài đăng tương ứng.",
+                    Data = null
+                };
+            }
             var userId = listing.UserId;
 
-
-            Payment payment;
-            payment = new Payment
-            {
-                ListingId = listingId,
-                TransactionNo = query["vnp_TransactionNo"],
-                BankCode = query["vnp_BankCode"],
-                ResponseCode = responseCode,
-                SecureHash = query["vnp_SecureHash"],
-                CreatedBy = userId,
-                PaymentMethod = PaymentMethodEnum.VnPay,
-                RawData = string.Join("&", query.Select(x => $"{x.Key}={x.Value}")),
-                CreationDate = DateTime.UtcNow.AddHours(7),
-                CreatedAt = DateTime.UtcNow.AddHours(7),
-                IsDeleted = false
-            };
-            await _unitOfWork.paymentRepository.AddAsync(payment);
             if (isValid && responseCode == "00")
             {
-                var getListing = await _unitOfWork.listingRepository.GetListingById(listing.Id);
-                getListing.PaymentStatus = PaymentStatusEnum.Success;
-                getListing.Status = StatusEnum.Pending;
-                getListing.ModificationDate = DateTime.UtcNow.AddHours(7);
-                _unitOfWork.listingRepository.Update(getListing);
+                listing.Status = StatusEnum.Pending;
+                listing.PaymentStatus = PaymentStatusEnum.Success;
+                listing.ActivatedAt = null;
+                listing.ExpiredAt = null;
+                listing.ModificationDate = DateTime.UtcNow.AddHours(7);
+                _unitOfWork.listingRepository.Update(listing);
 
-                var transaction = new Transaction
+                var newTransaction = new Transaction
                 {
                     Id = Guid.NewGuid(),
-                    Amount = getListing.Package.Price,
+                    Amount = listing.Package.Price,
                     UserId = (Guid)userId,
                     ListingId = listing.Id,
                     PaymentId = payment.Id,
@@ -281,24 +372,23 @@ namespace EBTP.Service.Services
                     PaymentMethod = "Online",
                     Status = PaymentStatusEnum.Success,
                     TransactionDate = DateTime.UtcNow.AddHours(7),
-                    Notes = @$"Thanh toán thành công bài đăng ""{listing.Id}""",
+                    Notes = @$"Thanh toán thành công bài đăng ""{listing.Title}""",
                     IsDeleted = false,
                     CreationDate = DateTime.UtcNow.AddHours(7)
                 };
-                await _unitOfWork.transactionRepository.AddAsync(transaction);
+                await _unitOfWork.transactionRepository.AddAsync(newTransaction);
             }
             else
             {
-                listing.TransactionId = Guid.NewGuid();
-                var getListing = await _unitOfWork.listingRepository.GetListingById(listing.Id);
-                getListing.PaymentStatus = PaymentStatusEnum.Failed;
-                getListing.Status = StatusEnum.Pending;
-                getListing.ModificationDate = DateTime.UtcNow.AddHours(7);
-                _unitOfWork.listingRepository.Update(getListing);
-                var transaction = new Transaction
+                listing.PaymentStatus = PaymentStatusEnum.Failed;
+                listing.Status = StatusEnum.Pending;
+                listing.ModificationDate = DateTime.UtcNow.AddHours(7);
+                _unitOfWork.listingRepository.Update(listing);
+
+                var failedTransaction = new Transaction
                 {
                     Id = Guid.NewGuid(),
-                    Amount = getListing.Package.Price,
+                    Amount = listing.Package.Price,
                     UserId = (Guid)userId,
                     ListingId = listing.Id,
                     PaymentId = payment.Id,
@@ -306,13 +396,12 @@ namespace EBTP.Service.Services
                     Currency = "VND",
                     PaymentMethod = "Online",
                     Status = PaymentStatusEnum.Canceled,
-                    Notes = @$"Thanh toán thất bại bài đăng ""{listing.Id}""",
+                    Notes = @$"Thanh toán thất bại bài đăng ""{listing.Title}""",
                     CreatedBy = userId,
                     IsDeleted = false,
                     CreationDate = DateTime.UtcNow.AddHours(7)
                 };
-                await _unitOfWork.transactionRepository.AddAsync(transaction);
-                await _unitOfWork.SaveChangeAsync();
+                await _unitOfWork.transactionRepository.AddAsync(failedTransaction); await _unitOfWork.SaveChangeAsync();
                 return new Result<object>
                 {
                     Error = 1,
@@ -326,8 +415,8 @@ namespace EBTP.Service.Services
             return new Result<object>
             {
                 Error = 0,
-                Message = "Thanh toán thành công",
-                Data = listingId
+                Message = "Thanh toán thành công.",
+                Data = null
             };
         }
         public async Task<Result<object>> AcceptListingAsync(Guid listingId)
@@ -447,7 +536,7 @@ namespace EBTP.Service.Services
                         Message = "Listing không tồn tại"
                     };
                 }
-
+                 
                 if (listing.UserId != userId)
                 {
                     return new Result<ListingDTO>

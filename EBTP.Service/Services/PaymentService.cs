@@ -27,27 +27,24 @@ namespace EBTP.Service.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<string> CreatePaymentUrl(Guid listingId, decimal totalAmount, HttpContext context)
+        public async Task<string> CreatePaymentUrl(string transactionNo, decimal totalAmount, HttpContext context)
         {
             var vnpay = new VnPayLibrary();
 
             vnpay.AddRequestData("vnp_Version", "2.1.0");
             vnpay.AddRequestData("vnp_Command", "pay");
             vnpay.AddRequestData("vnp_TmnCode", _settings.TmnCode);
-
             vnpay.AddRequestData("vnp_Amount", ((int)(totalAmount * 100)).ToString());
-
             vnpay.AddRequestData("vnp_CreateDate", DateTime.UtcNow.AddHours(7).ToString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_CurrCode", "VND");
             vnpay.AddRequestData("vnp_IpAddr", context.Connection.RemoteIpAddress?.ToString());
             vnpay.AddRequestData("vnp_Locale", "vn");
-
-            vnpay.AddRequestData("vnp_OrderInfo", $"Thanh toán đơn hàng với ListingId: {listingId}");
+            vnpay.AddRequestData("vnp_OrderInfo", $"Thanh toán đơn hàng mã {transactionNo}");
             vnpay.AddRequestData("vnp_OrderType", "other");
-
             vnpay.AddRequestData("vnp_ReturnUrl", _settings.ReturnUrl);
 
-            vnpay.AddRequestData("vnp_TxnRef", listingId.ToString());
+            // ✅ mã giao dịch duy nhất
+            vnpay.AddRequestData("vnp_TxnRef", transactionNo);
 
             var paymentUrl = vnpay.CreateRequestUrl(_settings.PaymentUrl, _settings.HashSecret);
             return paymentUrl;
@@ -56,16 +53,16 @@ namespace EBTP.Service.Services
         {
 
             var parameters = new Dictionary<string, string>
-    {
-        { "vnp_Version", "2.1.0" },
-        { "vnp_Command", "querydr" },
-        { "vnp_TmnCode",  _settings.TmnCode },
-        { "vnp_TxnRef", txnRef },
-        { "vnp_OrderInfo", orderInfo },
-        { "vnp_TransactionDate", transactionDate },
-        { "vnp_CreateDate", DateTime.UtcNow.AddHours(7).ToString("yyyyMMddHHmmss") },
-        { "vnp_IpAddr", "127.0.0.1" }
-    };
+     {
+         { "vnp_Version", "2.1.0" },
+         { "vnp_Command", "querydr" },
+         { "vnp_TmnCode",  _settings.TmnCode },
+         { "vnp_TxnRef", txnRef },
+         { "vnp_OrderInfo", orderInfo },
+         { "vnp_TransactionDate", transactionDate },
+         { "vnp_CreateDate", DateTime.UtcNow.AddHours(7).ToString("yyyyMMddHHmmss") },
+         { "vnp_IpAddr", "127.0.0.1" }
+     };
 
             string rawData = string.Join("&", parameters
                 .OrderBy(kvp => kvp.Key)

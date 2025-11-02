@@ -29,12 +29,12 @@ namespace EBTP.Repository.Entities
         public string? Color { get; set; }
         public int? Size { get; set; }
         public int? Mass { get; set; }
-
+        public StatusEnum Status { get; set; }
+        public ResonRejectListingEnum? ResonReject { get; set; }
+        public string? DescriptionReject { get; set; }
+        public PaymentStatusEnum PaymentStatus { get; set; } = PaymentStatusEnum.AwaitingPayment;
         public DateTime? ActivatedAt { get; set; }
         public DateTime? ExpiredAt { get; set; }
-        public ICollection<ListingImage> ListingImages { get; set; } = new List<ListingImage>();
-        public PaymentStatusEnum PaymentStatus { get; set; } = PaymentStatusEnum.AwaitingPayment;
-        public StatusEnum Status { get; set; }
         [ForeignKey("BrandId")]
         public Brand Brand { get; set; }
 
@@ -42,9 +42,9 @@ namespace EBTP.Repository.Entities
         public User User { get; set; }
         [ForeignKey("PackageId")]
         public Package? Package { get; set; }
-        [ForeignKey("TransactionId")]
-        public Transaction? Transaction { get; set; }
-        public Payment? Payment { get; set; }
+        public ICollection<ListingImage> ListingImages { get; set; } = new List<ListingImage>();
+        public ICollection<Transaction?> Transactions { get; set; }
+        public ICollection<Favourite> Favourites { get; set; } = new List<Favourite>();
 
     }
 }
