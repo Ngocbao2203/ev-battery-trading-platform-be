@@ -19,8 +19,10 @@ namespace EBTP.Repository.Repositories
         private readonly IListingRepository _listingRepository;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IPaymentRepository _paymentRepository;
+        private readonly IFavouriteRepository _favouriteRepository;
+        private readonly IReportRepository _reportRepository;
 
-        public UnitOfWork(AppDbContext context, IUserRepository userRepository, IAuthRepository authRepository, IBrandRepository brandRepository, IPackageRepository packageRepository, IListingImageRepository listingImageRepository, IListingRepository listingRepository, ITransactionRepository transactionRepository, IPaymentRepository paymentRepository)
+        public UnitOfWork(AppDbContext context, IUserRepository userRepository, IAuthRepository authRepository, IBrandRepository brandRepository, IPackageRepository packageRepository, IListingImageRepository listingImageRepository, IListingRepository listingRepository, ITransactionRepository transactionRepository, IPaymentRepository paymentRepository, IFavouriteRepository favouriteRepository, IReportRepository reportRepository)
         {
             _context = context;
             _userRepository = userRepository;
@@ -31,6 +33,8 @@ namespace EBTP.Repository.Repositories
             _listingRepository = listingRepository;
             _transactionRepository = transactionRepository;
             _paymentRepository = paymentRepository;
+            _favouriteRepository = favouriteRepository;
+            _reportRepository = reportRepository;
         }
 
         public IUserRepository userRepository => _userRepository;
@@ -40,7 +44,9 @@ namespace EBTP.Repository.Repositories
         public IListingImageRepository listingImageRepository => _listingImageRepository;
         public ITransactionRepository transactionRepository => _transactionRepository;
         public IPaymentRepository paymentRepository => _paymentRepository;
+        public IFavouriteRepository favouriteRepository => _favouriteRepository;
 
+        public IReportRepository reportRepository => _reportRepository;
         public IListingRepository listingRepository => _listingRepository;
         public async Task<int> SaveChangeAsync()
         {

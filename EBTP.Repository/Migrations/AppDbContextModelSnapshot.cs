@@ -62,6 +62,48 @@ namespace EBTP.Repository.Migrations
                     b.ToTable("Brand", (string)null);
                 });
 
+            modelBuilder.Entity("EBTP.Repository.Entities.Favourite", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeleteBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("ListingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ModificationBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Favourite");
+                });
+
             modelBuilder.Entity("EBTP.Repository.Entities.Listing", b =>
                 {
                     b.Property<Guid>("Id")
@@ -110,6 +152,9 @@ namespace EBTP.Repository.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DescriptionReject")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("ExpiredAt")
                         .HasColumnType("datetime2");
 
@@ -144,6 +189,9 @@ namespace EBTP.Repository.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("ResonReject")
+                        .HasColumnType("int");
+
                     b.Property<int?>("Size")
                         .HasColumnType("int");
 
@@ -169,8 +217,6 @@ namespace EBTP.Repository.Migrations
                     b.HasIndex("BrandId");
 
                     b.HasIndex("PackageId");
-
-                    b.HasIndex("TransactionId");
 
                     b.HasIndex("UserId");
 
@@ -311,7 +357,7 @@ namespace EBTP.Repository.Migrations
                     b.Property<bool>("IsRefunded")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("ListingId")
+                    b.Property<Guid?>("ListingId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("ModificationBy")
@@ -337,10 +383,58 @@ namespace EBTP.Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ListingId")
-                        .IsUnique();
+                    b.HasIndex("ListingId");
 
                     b.ToTable("Payment");
+                });
+
+            modelBuilder.Entity("EBTP.Repository.Entities.Report", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeleteBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("ListingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ModificationBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("OtherReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Reason")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId");
+
+                    b.HasIndex("UserId", "ListingId")
+                        .IsUnique();
+
+                    b.ToTable("Report");
                 });
 
             modelBuilder.Entity("EBTP.Repository.Entities.Role", b =>
@@ -410,7 +504,6 @@ namespace EBTP.Repository.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Notes")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("PackageId")
@@ -420,7 +513,6 @@ namespace EBTP.Repository.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("PaymentMethod")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
@@ -530,6 +622,53 @@ namespace EBTP.Repository.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("User");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("8b56687e-8377-4743-aac9-08dcf5c4b471"),
+                            CreationDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "admin@gmail.com",
+                            IsDeleted = false,
+                            IsVerified = true,
+                            PasswordHash = "$2y$10$O1smXu1TdT1x.Z35v5jQauKcQIBn85VYRqiLggPD8HMF9rRyGnHXy",
+                            PhoneNumber = "0123456789",
+                            RoleId = 1,
+                            Status = 1,
+                            UserName = "Admin"
+                        },
+                        new
+                        {
+                            Id = new Guid("8b56687e-8377-4743-aac9-08dcf5c4b47f"),
+                            CreationDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "staff@gmail.com",
+                            IsDeleted = false,
+                            IsVerified = true,
+                            PasswordHash = "$2y$10$O1smXu1TdT1x.Z35v5jQauKcQIBn85VYRqiLggPD8HMF9rRyGnHXy",
+                            PhoneNumber = "0123456789",
+                            RoleId = 2,
+                            Status = 1,
+                            UserName = "Staff"
+                        });
+                });
+
+            modelBuilder.Entity("EBTP.Repository.Entities.Favourite", b =>
+                {
+                    b.HasOne("EBTP.Repository.Entities.Listing", "Listing")
+                        .WithMany("Favourites")
+                        .HasForeignKey("ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EBTP.Repository.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EBTP.Repository.Entities.Listing", b =>
@@ -542,10 +681,6 @@ namespace EBTP.Repository.Migrations
                         .WithMany("Listings")
                         .HasForeignKey("PackageId");
 
-                    b.HasOne("EBTP.Repository.Entities.Transaction", "Transaction")
-                        .WithMany()
-                        .HasForeignKey("TransactionId");
-
                     b.HasOne("EBTP.Repository.Entities.User", "User")
                         .WithMany("Listings")
                         .HasForeignKey("UserId");
@@ -553,8 +688,6 @@ namespace EBTP.Repository.Migrations
                     b.Navigation("Brand");
 
                     b.Navigation("Package");
-
-                    b.Navigation("Transaction");
 
                     b.Navigation("User");
                 });
@@ -573,18 +706,35 @@ namespace EBTP.Repository.Migrations
             modelBuilder.Entity("EBTP.Repository.Entities.Payment", b =>
                 {
                     b.HasOne("EBTP.Repository.Entities.Listing", "Listing")
-                        .WithOne("Payment")
-                        .HasForeignKey("EBTP.Repository.Entities.Payment", "ListingId")
+                        .WithMany()
+                        .HasForeignKey("ListingId");
+
+                    b.Navigation("Listing");
+                });
+
+            modelBuilder.Entity("EBTP.Repository.Entities.Report", b =>
+                {
+                    b.HasOne("EBTP.Repository.Entities.Listing", "Listing")
+                        .WithMany()
+                        .HasForeignKey("ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EBTP.Repository.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Listing");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EBTP.Repository.Entities.Transaction", b =>
                 {
                     b.HasOne("EBTP.Repository.Entities.Listing", "Listing")
-                        .WithMany()
+                        .WithMany("Transactions")
                         .HasForeignKey("ListingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -632,9 +782,11 @@ namespace EBTP.Repository.Migrations
 
             modelBuilder.Entity("EBTP.Repository.Entities.Listing", b =>
                 {
+                    b.Navigation("Favourites");
+
                     b.Navigation("ListingImages");
 
-                    b.Navigation("Payment");
+                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("EBTP.Repository.Entities.Package", b =>

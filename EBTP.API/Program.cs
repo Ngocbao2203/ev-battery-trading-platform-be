@@ -27,6 +27,8 @@ builder.Services.AddScoped<IListingRepository, ListingRepository>();
 builder.Services.AddScoped<IListingImageRepository, ListingImageRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IFavouriteRepository, FavouriteRepository>();
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
 
 //Service
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -36,6 +38,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPackageService, PakageService>();
 builder.Services.AddScoped<IListingService, ListingService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IFavouriteService, FavouriteService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 

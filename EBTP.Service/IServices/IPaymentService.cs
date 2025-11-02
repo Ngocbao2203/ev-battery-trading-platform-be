@@ -9,8 +9,9 @@ namespace EBTP.Service.IServices
 {
     public interface IPaymentService
     {
-        Task<string> CreatePaymentUrl(Guid listingId, decimal totalAmount, HttpContext context);
+        Task<string> CreatePaymentUrl(string transactionNo, decimal totalAmount, HttpContext context);
         Task<bool> ValidateReturnData(IQueryCollection query);
         Task<string> QueryTransactionAsync(string txnRef, string orderInfo, string transactionDate);
+
     }
 }

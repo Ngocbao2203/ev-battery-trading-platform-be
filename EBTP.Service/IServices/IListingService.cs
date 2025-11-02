@@ -20,6 +20,7 @@ namespace EBTP.Service.IServices
         /*        Task<Result<ListingDTO>> UpdateAsync(Guid id, UpdateListingDTO updateListingDTO);
                 Task<Result<bool>> DeleteAsync(Guid id);*/
         Task<Result<string>> CreateVnPayUrlAsync(Guid listingId, HttpContext httpContext);
+        Task<Result<string>> RetryPayment(Guid listingId, HttpContext httpContext);
         Task<Result<object>> HandleVnPayReturnAsync(IQueryCollection query);
 
         //Admin

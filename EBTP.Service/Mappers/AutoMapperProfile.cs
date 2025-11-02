@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using EBTP.Repository.Entities;
 using EBTP.Service.DTOs.Brand;
+using EBTP.Service.DTOs.Favourite;
 using EBTP.Service.DTOs.Listing;
 using EBTP.Service.DTOs.ListingImage;
 using EBTP.Service.DTOs.Package;
+using EBTP.Service.DTOs.Report;
 using EBTP.Service.DTOs.User;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -37,11 +39,21 @@ namespace EBTP.Service.Mappers
             CreateMap<CreateListingDTO, Listing>()
                 .ForMember(dest => dest.ListingImages, opt => opt.Ignore())
                 .ReverseMap();
+            CreateMap<Listing, ViewListingFavouriteDTO>()
+                .ForMember(dest => dest.ListingImages, opt => opt.MapFrom(src => src.ListingImages))
+                .ReverseMap();
 
             //ListingImage
             CreateMap<ListingImageDTO, ListingImage>().ReverseMap();
             CreateMap<IFormFile, ListingImage>()
             .ForMember(dest => dest.ImageUrl, opt => opt.Ignore());
+            //Favourite
+            CreateMap<Favourite, CreateFavouriteDTO>().ReverseMap();
+            CreateMap<ViewFavouriteDTO, Favourite>().ReverseMap();
+
+            //Report
+            CreateMap<Report, ReportDTO>().ReverseMap();
+            CreateMap<Report, CreateReportDTO>().ReverseMap();
         }
     }
 }
