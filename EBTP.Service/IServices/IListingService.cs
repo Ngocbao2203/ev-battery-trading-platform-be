@@ -25,7 +25,7 @@ namespace EBTP.Service.IServices
 
         //Admin
         Task<Result<object>> AcceptListingAsync(Guid listingId);
-        Task<Result<object>> RejectListingAsync(Guid listingId, string? reason);
+        Task<Result<object>> RejectListingAsync(Guid listingId, ResonRejectListingEnum reason, string descriptionReject);
         Task<Result<ListingDTO>> UpdateAsync(UpdateListingDTO updateListingDTO);
         
         //Hangfire

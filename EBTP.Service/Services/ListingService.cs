@@ -467,7 +467,7 @@ namespace EBTP.Service.Services
             };
         }
 
-        public async Task<Result<object>> RejectListingAsync(Guid listingId, string? reason)
+        public async Task<Result<object>> RejectListingAsync(Guid listingId, ResonRejectListingEnum reason, string descriptionReject)
         {
             var getListing = await _unitOfWork.listingRepository.GetListingById(listingId);
 
@@ -504,6 +504,8 @@ namespace EBTP.Service.Services
             }
             getListing.Status = StatusEnum.Rejected;
             getListing.ModificationDate = DateTime.UtcNow.AddHours(7);
+            getListing.ResonReject = reason;
+            getListing.DescriptionReject = descriptionReject;
             _unitOfWork.listingRepository.Update(getListing);
             await _unitOfWork.SaveChangeAsync();
             return new Result<object>()
