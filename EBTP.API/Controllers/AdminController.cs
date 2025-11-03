@@ -40,8 +40,7 @@ namespace EBTP.API.Controllers
             }
             return Ok(result);
         }
-        returnn Ok(result);
-        }
+
         [HttpGet("Get-All-Users")]
         public async Task<IActionResult> GetAllUsers([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
         {
