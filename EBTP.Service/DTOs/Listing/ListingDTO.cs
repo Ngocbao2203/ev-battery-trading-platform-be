@@ -40,5 +40,7 @@ namespace EBTP.Service.DTOs.Listing
         public DateTime? ActivatedAt { get; set; }
         public DateTime? ExpiredAt { get; set; }
         public DateTime CreationDate { get; set; }
+        public ResonRejectListingEnum? ResonReject { get; set; }
+        public string? DescriptionReject { get; set; }
     }
 }

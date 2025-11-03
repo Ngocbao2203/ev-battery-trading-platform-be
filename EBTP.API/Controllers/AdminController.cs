@@ -1,4 +1,5 @@
-﻿using EBTP.Service.IServices;
+﻿using EBTP.Repository.Enum;
+using EBTP.Service.IServices;
 using EBTP.Service.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -30,14 +31,16 @@ namespace EBTP.API.Controllers
         }
 
         [HttpPost("Reject-Listing/{listingId}")]
-        public async Task<IActionResult> RejectListing(Guid listingId, [FromQuery] string? reason)
+        public async Task<IActionResult> RejectListing(Guid listingId, [FromQuery] ResonRejectListingEnum reason, [FromQuery] string descriptionReject)
         {
-            var result = await _listingService.RejectListingAsync(listingId, reason);
+            var result = await _listingService.RejectListingAsync(listingId, reason, descriptionReject);
             if (result.Error != 0)
             {
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+        returnn Ok(result);
         }
         [HttpGet("Get-All-Users")]
         public async Task<IActionResult> GetAllUsers([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
