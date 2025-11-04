@@ -48,13 +48,13 @@ namespace EBTP.Service.Services
         }
         public async Task<Result<object>> CreateAsync(CreateBrandDTO dto)
         {
-            var checkName = await _unitOfWork.brandRepository.GetByNameAsync(dto.Name);
-            if (checkName != null)
+            var existedBrand = await _unitOfWork.brandRepository.GetByNameAndTypeAsync(dto.Name, dto.Type);
+            if (existedBrand != null)
             {
                 return new Result<object>()
                 {
                     Error = 1,
-                    Message = "Tên thương hiệu đã tồn tại",
+                    Message = "Thương hiệu với tên và loại này đã tồn tại",
                     Count = 0,
                     Data = null
                 };

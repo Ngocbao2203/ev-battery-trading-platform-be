@@ -1,5 +1,6 @@
 ﻿using EBTP.Repository.Data;
 using EBTP.Repository.Entities;
+using EBTP.Repository.Enum;
 using EBTP.Repository.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -22,6 +23,12 @@ namespace EBTP.Repository.Repositories
         {
             var result = await _context.Brand.Where(p => p.Name == name).FirstOrDefaultAsync();
             return result;
+        }
+
+        public async Task<Brand?> GetByNameAndTypeAsync(string name, BrandTypeEnum type)
+        {
+            return await _context.Brand
+                .FirstOrDefaultAsync(b => b.Name == name && b.Type == type);
         }
     }
 }
