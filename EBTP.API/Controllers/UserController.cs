@@ -24,6 +24,14 @@ namespace EBTP.API.Controllers
             var getUser = await _userService.GetCurrentUserById();
             return Ok(getUser);
         }
+
+        [HttpGet("GetUserById")]
+        public async Task<IActionResult> GetCurrentUserByUserId([FromQuery] Guid userId)
+        {
+            var getUser = await _userService.GetUserByUserId(userId);
+            return Ok(getUser);
+        }
+
         [HttpPut("UpdateInfoUser")]
         [Authorize]
         public async Task<IActionResult> UpdateUserInfo([FromForm] UpdateInfoUserDTO updateDto)

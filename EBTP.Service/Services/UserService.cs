@@ -54,6 +54,13 @@ namespace EBTP.Service.Services
             var result = _mapper.Map<UserDTO>(await _unitOfWork.userRepository.GetAllUserById(userId));
             return new Result<UserDTO>() { Error = 0, Message = "Lấy thông tin người dùng thành công", Data = result };
         }
+
+        public async Task<Result<UserDTO>> GetUserByUserId(Guid userId)
+        {
+            var result = _mapper.Map<UserDTO>(await _unitOfWork.userRepository.GetAllUserById(userId));
+            return new Result<UserDTO>() { Error = 0, Message = "Lấy thông tin người dùng thành công", Data = result };
+        }
+
         public async Task<Result<object>> UpdateUserInfoAsync(UpdateInfoUserDTO updateDto)
         {
             try
