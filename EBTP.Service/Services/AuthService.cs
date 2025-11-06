@@ -38,48 +38,35 @@ namespace EBTP.Service.Services
                 var user = await _unitOfWork.userRepository.GetUserByEmail(loginDTO.Email);
 
                 if (user == null)
-                {
-                    throw new KeyNotFoundException("Email sai hoặc tài khoản không tồn tại.");
-                }
+                    throw new ApplicationException("Email sai hoặc tài khoản không tồn tại.");
+
+                if (user.IsBanned)
+                    throw new ApplicationException("Tài khoản đã bị cấm. Vui lòng liên hệ quản trị viên để được hỗ trợ.");
 
                 if (!user.IsVerified)
-                {
-                    throw new InvalidOperationException("Tài khoản chưa được kích hoạt. Vui lòng xác nhận email.");
-                }
-                if (user.Status.ToString() != "Active")
-                {
-                    throw new InvalidOperationException("Tài khoản đã bị khóa. Vui lòng liên hệ với trang web để được giải quyết.");
-                }
-                if (!BCrypt.Net.BCrypt.Verify(loginDTO.PasswordHash, user.PasswordHash))
-                {
-                    throw new UnauthorizedAccessException("Mật khẩu sai.");
-                }
+                    throw new ApplicationException("Tài khoản chưa được kích hoạt. Vui lòng xác nhận email.");
 
-                // Generate JWT token
+                if (user.Status.ToString() != "Active")
+                    throw new ApplicationException("Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên để được hỗ trợ.");
+
+                var isPasswordValid = BCrypt.Net.BCrypt.Verify(loginDTO.PasswordHash, user.PasswordHash);
+                if (!isPasswordValid)
+                    throw new ApplicationException("Mật khẩu không chính xác.");
+
                 var token = await GenerateJwtToken(user);
 
+                _unitOfWork.userRepository.Update(user);
                 await _unitOfWork.SaveChangeAsync();
+
                 return token;
             }
-            catch (KeyNotFoundException ex)
+            catch (ApplicationException)
             {
-                // Handle cases where the user is not found
-                throw new ApplicationException("Email sai hoặc tài khoản không tồn tại.", ex);
-            }
-            catch (InvalidOperationException ex)
-            {
-                // Handle cases where the account is not verified
-                throw new ApplicationException("Tài khoản chưa được kích hoạt. Vui lòng xác nhận email.", ex);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                // Handle cases where the password is invalid
-                throw new ApplicationException("Mật khẩu sai.", ex);
+                throw;
             }
             catch (Exception ex)
             {
-                // General exception handling
-                throw new ApplicationException("Xảy ra lỗi trong quá trình đăng nhập.", ex);
+                throw new ApplicationException("Xảy ra lỗi trong quá trình đăng nhập. Vui lòng thử lại sau.", ex);
             }
         }
         public async Task<Result<object>> RegisterUserAsync(UserRegistrationDTO userRegistrationDto)

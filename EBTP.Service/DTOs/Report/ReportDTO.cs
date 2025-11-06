@@ -12,6 +12,7 @@ namespace EBTP.Service.DTOs.Report
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public Guid ListingId { get; set; }
+        public string ImageReport { get; set; }
         public ReportReasonEnum Reason { get; set; }
         public string? OtherReason { get; set; }
     }

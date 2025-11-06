@@ -1,4 +1,5 @@
 ﻿using EBTP.Repository.Enum;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,6 @@ namespace EBTP.Service.DTOs.Report
         public Guid ListingId { get; set; }
         public ReportReasonEnum Reason { get; set; }
         public string? OtherReason { get; set; }
+        public IFormFile ImageReport { get; set; }
     }
 }

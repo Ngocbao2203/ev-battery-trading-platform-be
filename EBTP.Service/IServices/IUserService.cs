@@ -17,5 +17,7 @@ namespace EBTP.Service.IServices
         Task<Result<object>> UpdateUserInfoAsync(UpdateInfoUserDTO updateDto);
         Task<Result<List<UserDTO>>> GetAllUsers(int pageIndex, int pageSize);
         Task<Result<UserDTO>> GetUserByUserId(Guid userId);
+        Task<Result<object>> BanUser(Guid userId, string descriptionBan);
+        Task<Result<object>> UnBanUser(Guid userId);
     }
 }

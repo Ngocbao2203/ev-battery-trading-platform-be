@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using EBTP.Repository.Entities;
+using EBTP.Repository.Enum;
 using EBTP.Repository.IRepositories;
 using EBTP.Service.Abstractions.Shared;
 using EBTP.Service.DTOs.User;
@@ -116,6 +117,75 @@ namespace EBTP.Service.Services
                 Error = 0,
                 Message = "Lấy danh sách thông tin người dùng thành công",
                 Data = result
+            };
+        }
+        public async Task<Result<object>> BanUser(Guid userId, string descriptionBan)
+        {
+            var getUser = await _unitOfWork.userRepository.GetUserById(userId);
+            if (getUser == null)
+            {
+                return new Result<object>()
+                {
+                    Error = 1,
+                    Message = "Người dùng không tồn tại",
+                    Data = null
+                };
+            }
+
+            if (getUser.IsBanned == true)
+            {
+                return new Result<object>()
+                {
+                    Error = 1,
+                    Message = "Người dùng đã bị khóa",
+                    Data = null
+                };
+            }
+            getUser.IsBanned = true;
+            getUser.Status = StatusEnum.Inactive;
+            getUser.BanDescription = descriptionBan;
+            await _unitOfWork.userRepository.UpdateAsync(getUser);
+            return new Result<object>()
+            {
+                Error = 0,
+                Message = "Khóa người dùng thành công",
+                Data = null
+            };
+        }
+        public async Task<Result<object>> UnBanUser(Guid userId)
+        {
+            var user = await _unitOfWork.userRepository.GetUserById(userId);
+            if (user == null)
+            {
+                return new Result<object>()
+                {
+                    Error = 1,
+                    Message = "Người dùng không tồn tại",
+                    Data = null
+                };
+            }
+
+            if (!user.IsBanned)
+            {
+                return new Result<object>
+                {
+                    Error = 2,
+                    Message = "Người dùng này hiện không bị cấm.",
+                    Data = null
+                };
+            }
+
+            user.IsBanned = false;
+            user.Status = StatusEnum.Active;
+            user.BanDescription = null;
+            user.BanDate = null;
+
+            await _unitOfWork.userRepository.UpdateAsync(user);
+            return new Result<object>()
+            {
+                Error = 0,
+                Message = "Đã gỡ cấm người dùng thành công.",
+                Data = null
             };
         }
     }

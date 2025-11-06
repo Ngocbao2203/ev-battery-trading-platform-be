@@ -15,6 +15,7 @@ namespace EBTP.Repository.Entities
         public Guid ListingId { get; set; }
         public ReportReasonEnum Reason { get; set; }
         public string? OtherReason { get; set; }
+        public string ImageReport { get; set; }
         public User User { get; set; }
         public Listing Listing { get; set; }
     }
