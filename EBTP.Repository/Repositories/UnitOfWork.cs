@@ -21,8 +21,10 @@ namespace EBTP.Repository.Repositories
         private readonly IPaymentRepository _paymentRepository;
         private readonly IFavouriteRepository _favouriteRepository;
         private readonly IReportRepository _reportRepository;
+        private readonly IChatThreadRepository _chatThreadRepository;
+        private readonly IMessageRepository _messageRepository;
 
-        public UnitOfWork(AppDbContext context, IUserRepository userRepository, IAuthRepository authRepository, IBrandRepository brandRepository, IPackageRepository packageRepository, IListingImageRepository listingImageRepository, IListingRepository listingRepository, ITransactionRepository transactionRepository, IPaymentRepository paymentRepository, IFavouriteRepository favouriteRepository, IReportRepository reportRepository)
+        public UnitOfWork(AppDbContext context, IUserRepository userRepository, IAuthRepository authRepository, IBrandRepository brandRepository, IPackageRepository packageRepository, IListingImageRepository listingImageRepository, IListingRepository listingRepository, ITransactionRepository transactionRepository, IPaymentRepository paymentRepository, IFavouriteRepository favouriteRepository, IReportRepository reportRepository, IChatThreadRepository chatThreadRepository, IMessageRepository messageRepository)
         {
             _context = context;
             _userRepository = userRepository;
@@ -35,6 +37,8 @@ namespace EBTP.Repository.Repositories
             _paymentRepository = paymentRepository;
             _favouriteRepository = favouriteRepository;
             _reportRepository = reportRepository;
+            _chatThreadRepository = chatThreadRepository;
+            _messageRepository = messageRepository;
         }
 
         public IUserRepository userRepository => _userRepository;
@@ -48,6 +52,8 @@ namespace EBTP.Repository.Repositories
 
         public IReportRepository reportRepository => _reportRepository;
         public IListingRepository listingRepository => _listingRepository;
+        public IChatThreadRepository chatThreadRepository => _chatThreadRepository;
+        public IMessageRepository messageRepository => _messageRepository;
         public async Task<int> SaveChangeAsync()
         {
             return await _context.SaveChangesAsync();

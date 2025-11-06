@@ -24,6 +24,8 @@ namespace EBTP.Repository.Data
         public DbSet<Report> Report { get; set; }
         public DbSet<Favourite> Favourite { get; set; }
         public DbSet<Payment> Payment { get; set; }
+        public DbSet<Message> Message { get; set; }
+        public DbSet<ChatThread> ChatThread { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

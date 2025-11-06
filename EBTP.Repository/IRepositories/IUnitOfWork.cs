@@ -18,6 +18,8 @@ namespace EBTP.Repository.IRepositories
         IPaymentRepository paymentRepository { get; }
         IFavouriteRepository favouriteRepository { get; }
         IReportRepository reportRepository { get; }
+        IMessageRepository messageRepository { get; }
+        IChatThreadRepository chatThreadRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }
