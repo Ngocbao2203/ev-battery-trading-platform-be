@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EBTP.Repository.Migrations
 {
     /// <inheritdoc />
-    public partial class upreturnpayment : Migration
+    public partial class messageandchatthread : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

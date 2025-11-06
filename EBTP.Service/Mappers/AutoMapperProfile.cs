@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using EBTP.Repository.Entities;
 using EBTP.Service.DTOs.Brand;
+using EBTP.Service.DTOs.ChatThread;
 using EBTP.Service.DTOs.Favourite;
 using EBTP.Service.DTOs.Listing;
 using EBTP.Service.DTOs.ListingImage;
+using EBTP.Service.DTOs.Message;
 using EBTP.Service.DTOs.Package;
 using EBTP.Service.DTOs.Report;
 using EBTP.Service.DTOs.User;
@@ -54,6 +56,18 @@ namespace EBTP.Service.Mappers
             //Report
             CreateMap<Report, ReportDTO>().ReverseMap();
             CreateMap<Report, CreateReportDTO>().ReverseMap();
+
+            //Message
+            CreateMap<SendMessageDTO, Message>().ReverseMap();
+            CreateMap<ViewMessageDTO, Message>().ReverseMap()
+                .ForMember(dest => dest.Id, src => src.MapFrom(x => x.Id));
+
+            //CharThread
+            CreateMap<ViewChatThreadDTO, ChatThread>().ReverseMap()
+                .ForMember(dest => dest.Id, src => src.MapFrom(x => x.Id));
+            CreateMap<ChatThreadDTO, ChatThread>().ReverseMap();
+            CreateMap<ChatThread, CreateChatThreadDTO>()
+            .ReverseMap();
         }
     }
 }

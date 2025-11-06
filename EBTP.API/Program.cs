@@ -1,4 +1,5 @@
 ﻿using EBTP.Repository.Data;
+using EBTP.Repository.Hubs;
 using EBTP.Repository.IRepositories;
 using EBTP.Repository.Repositories;
 using EBTP.Service.Abstractions.CloudinaryService;
@@ -29,6 +30,8 @@ builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IFavouriteRepository, FavouriteRepository>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<IChatThreadRepository, ChatThreadRepository>();
 
 //Service
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -40,8 +43,10 @@ builder.Services.AddScoped<IListingService, ListingService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IFavouriteService, FavouriteService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
 
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+builder.Services.AddScoped<IMessageNotifier, MessageNotifier>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
                     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
@@ -155,6 +160,9 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
     });
 
+builder.Services.AddSignalR();
+
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
@@ -210,5 +218,8 @@ app.UseHangfireDashboard();
 HangfireJobs.RegisterJobs();
 
 app.MapControllers();
+
+// SignalR
+app.MapHub<MessageHub>("hub/messageHub");
 
 app.Run();

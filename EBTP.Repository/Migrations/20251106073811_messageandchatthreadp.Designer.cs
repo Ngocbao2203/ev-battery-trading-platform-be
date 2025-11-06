@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EBTP.Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251102091905_upreturnpayment")]
-    partial class upreturnpayment
+    [Migration("20251106073811_messageandchatthreadp")]
+    partial class messageandchatthreadp
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -63,6 +63,50 @@ namespace EBTP.Repository.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Brand", (string)null);
+                });
+
+            modelBuilder.Entity("EBTP.Repository.Entities.ChatThread", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeleteBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ModificationBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ParticipantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ChatThread");
                 });
 
             modelBuilder.Entity("EBTP.Repository.Entities.Favourite", b =>
@@ -266,6 +310,59 @@ namespace EBTP.Repository.Migrations
                     b.HasIndex("ListingId");
 
                     b.ToTable("ListingImage", (string)null);
+                });
+
+            modelBuilder.Entity("EBTP.Repository.Entities.Message", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ChatThreadId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeleteBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MessageText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ModificationBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ReadAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChatThreadId");
+
+                    b.ToTable("Message");
                 });
 
             modelBuilder.Entity("EBTP.Repository.Entities.Package", b =>
@@ -655,6 +752,17 @@ namespace EBTP.Repository.Migrations
                         });
                 });
 
+            modelBuilder.Entity("EBTP.Repository.Entities.ChatThread", b =>
+                {
+                    b.HasOne("EBTP.Repository.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("EBTP.Repository.Entities.Favourite", b =>
                 {
                     b.HasOne("EBTP.Repository.Entities.Listing", "Listing")
@@ -704,6 +812,17 @@ namespace EBTP.Repository.Migrations
                         .IsRequired();
 
                     b.Navigation("Listing");
+                });
+
+            modelBuilder.Entity("EBTP.Repository.Entities.Message", b =>
+                {
+                    b.HasOne("EBTP.Repository.Entities.ChatThread", "ChatThread")
+                        .WithMany("Messages")
+                        .HasForeignKey("ChatThreadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChatThread");
                 });
 
             modelBuilder.Entity("EBTP.Repository.Entities.Payment", b =>
@@ -781,6 +900,11 @@ namespace EBTP.Repository.Migrations
             modelBuilder.Entity("EBTP.Repository.Entities.Brand", b =>
                 {
                     b.Navigation("Listings");
+                });
+
+            modelBuilder.Entity("EBTP.Repository.Entities.ChatThread", b =>
+                {
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("EBTP.Repository.Entities.Listing", b =>
