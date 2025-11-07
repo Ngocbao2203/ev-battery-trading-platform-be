@@ -19,28 +19,6 @@ namespace EBTP.API.Controllers
             _userService = userService;
         }
 
-        [HttpPost("Accept-Listing/{listingId}")]
-        public async Task<IActionResult> AcceptListing(Guid listingId)
-        {
-            var result = await _listingService.AcceptListingAsync(listingId);
-            if (result.Error != 0)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
-        }
-
-        [HttpPost("Reject-Listing/{listingId}")]
-        public async Task<IActionResult> RejectListing(Guid listingId, [FromQuery] ResonRejectListingEnum reason, [FromQuery] string descriptionReject)
-        {
-            var result = await _listingService.RejectListingAsync(listingId, reason, descriptionReject);
-            if (result.Error != 0)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
-        }
-
         [HttpGet("Get-All-Users")]
         public async Task<IActionResult> GetAllUsers([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
         {

@@ -31,9 +31,10 @@ namespace EBTP.Repository.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Role>().HasData(
-               new Role { Id = 1, RoleName = "Admin" },
-               new Role { Id = 2, RoleName = "User" }
-            );
+   new Role { Id = 1, RoleName = "Admin" },
+   new Role { Id = 2, RoleName = "User" },
+   new Role { Id = 3, RoleName = "Staff" }
+);
             modelBuilder.Entity<User>().HasData(
      new User
      {
@@ -55,7 +56,7 @@ namespace EBTP.Repository.Data
          Email = "staff@gmail.com",
          PasswordHash = "$2y$10$O1smXu1TdT1x.Z35v5jQauKcQIBn85VYRqiLggPD8HMF9rRyGnHXy",
          Status = StatusEnum.Active,
-         RoleId = 2,
+         RoleId = 3,
          IsVerified = true,
          PhoneNumber = "0123456789",
          CreationDate = new DateTime(2024, 01, 01, 00, 00, 00, DateTimeKind.Utc),

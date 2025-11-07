@@ -16,11 +16,14 @@ namespace EBTP.Service.Services
     {
         private readonly IUnitOfWork _unitOfWord;
         private readonly IMapper _mapper;
+        private readonly ICloudinaryService _cloudinaryService;
+        private static string FOLDER = "reports";
 
-        public ReportService(IUnitOfWork unitOfWord, IMapper mapper)
+        public ReportService(IUnitOfWork unitOfWord, IMapper mapper, ICloudinaryService cloudinaryService)
         {
             _unitOfWord = unitOfWord;
             _mapper = mapper;
+            _cloudinaryService = cloudinaryService;
         }
 
         public async Task<Result<List<ReportDTO>>> GetAllReports(int pageIndex, int pageSize)
@@ -94,6 +97,8 @@ namespace EBTP.Service.Services
 
                 var report = _mapper.Map<Report>(reportDTO);
                 report.Id = Guid.NewGuid();
+                var uploadResult = await _cloudinaryService.UploadProductImage(reportDTO.ImageReport, FOLDER);
+                report.ImageReport = uploadResult.SecureUrl.ToString();
                 report.CreationDate = DateTime.UtcNow.AddHours(7);
 
                 await _unitOfWord.reportRepository.AddAsync(report);

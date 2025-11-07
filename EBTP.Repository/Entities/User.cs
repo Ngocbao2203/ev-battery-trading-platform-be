@@ -26,11 +26,15 @@ namespace EBTP.Repository.Entities
         public DateTime? ResetTokenExpiry { get; set; }
         public string? Provider { get; set; }
         public string? ProviderKey { get; set; }
-
+        public bool IsBanned { get; set; } = false;
+        public string? BanDescription { get; set; }
+        public DateTime? BanDate { get; set; }
         public int RoleId { get; set; }
         [ForeignKey("RoleId")]
         public Role Role { get; set; }
 
         public ICollection<Listing> Listings { get; set; }
+        public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
+        public ICollection<Favourite> Favourites { get; set; } = new List<Favourite>();
     }
 }
