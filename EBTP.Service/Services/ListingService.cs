@@ -185,6 +185,10 @@ namespace EBTP.Service.Services
                 listing.Status = StatusEnum.Pending;
                 listing.UserId = userId;
                 listing.CreationDate = DateTime.UtcNow.AddHours(7);
+                if (package.PackageType == PackageTypeEnum.Free)
+                {
+                    listing.PaymentStatus = PaymentStatusEnum.Success;
+                }
                 await _unitOfWork.listingRepository.AddAsync(listing);
                 await _unitOfWork.SaveChangeAsync();
                 return new Result<object>()
