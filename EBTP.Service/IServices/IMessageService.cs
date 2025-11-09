@@ -17,5 +17,6 @@ namespace EBTP.Service.IServices
         Task<Result<object>> StartThreadAsync(CreateChatThreadDTO chatThread);
         Task<Result<bool>> SoftDeleteMessageAsync(Guid messageId);
         Task<Result<bool>> SoftDeleteChatThreadAsync(Guid chatThreadId);
+        Task<Result<ViewChatThreadDTO>> GetChatThreadByListingIdAsync(Guid listingId);
     }
 }

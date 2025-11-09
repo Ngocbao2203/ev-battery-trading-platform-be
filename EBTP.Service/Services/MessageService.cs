@@ -112,6 +112,18 @@ namespace EBTP.Service.Services
                 Data = result
             };
         }
+        public async Task<Result<ViewChatThreadDTO>> GetChatThreadByListingIdAsync(Guid listingId)
+        {
+            var result = _mapper.Map<ViewChatThreadDTO>(
+                await _unitOfWork.chatThreadRepository.GetChatThreadByListingAsync(listingId));
+
+            return new Result<ViewChatThreadDTO>
+            {
+                Error = 0,
+                Message = "View online chat thread successfully",
+                Data = result
+            };
+        }
         public async Task<Result<object>> SendMessageAsync(SendMessageDTO sendMessage)
         {
             var chatThread = await _unitOfWork.chatThreadRepository
@@ -213,6 +225,17 @@ namespace EBTP.Service.Services
                     Data = null
                 };
             }
+            var listing = await _unitOfWork.listingRepository.GetByIdAsync(chatThread.ListingId);
+
+            if (listing == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "no listing with that id was found",
+                    Data = null
+                };
+            }
 
             var existingThread = await _unitOfWork.chatThreadRepository
                 .GetExistingChatThreadByIdAsync(chatThread.UserId, chatThread.ParticipantId);
@@ -242,6 +265,7 @@ namespace EBTP.Service.Services
                     Id = thread.Id,
                     UserId = thread.UserId,
                     ParticipantId = thread.ParticipantId,
+                    ListingId = thread.ListingId,
                     Status = thread.Status,
                 };
 
