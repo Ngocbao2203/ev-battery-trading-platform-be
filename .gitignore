@@ -25,3 +25,5 @@ obj/
 .local
 .json
 TemplateEngineHost/vs/
+**/Migrations/
+/EBTP.Repository/Migrations/AppDbContextModelSnapshot.cs
