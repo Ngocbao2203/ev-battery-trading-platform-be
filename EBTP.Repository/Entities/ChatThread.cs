@@ -10,9 +10,11 @@ namespace EBTP.Repository.Entities
     {
         public Guid UserId { get; set; }
         public Guid ParticipantId { get; set; }
+        public Guid ListingId { get; set; }
         public string Status { get; set; }
 
         public User User { get; set; }
         public ICollection<Message> Messages { get; set; }
+        public Listing Listing { get; set; }
     }
 }

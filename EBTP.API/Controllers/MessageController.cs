@@ -32,6 +32,13 @@ namespace EBTP.API.Controllers
 
             return Ok(result);
         }
+        [HttpGet("get-chat-thread-by-listing-id/{listingId}")]
+        public async Task<IActionResult> GetChatThreadByListingIdAsync(Guid listingId)
+        {
+            var result = await _messageService.GetChatThreadByListingIdAsync(listingId);
+
+            return Ok(result);
+        }
 
         [HttpPost("send-message")]
         public async Task<IActionResult> SendMessageAsync([FromForm] SendMessageDTO sendMessage)

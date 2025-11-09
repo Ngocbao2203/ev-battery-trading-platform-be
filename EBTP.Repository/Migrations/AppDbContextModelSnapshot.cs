@@ -83,6 +83,9 @@ namespace EBTP.Repository.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("ListingId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("ModificationBy")
                         .HasColumnType("uniqueidentifier");
 
@@ -100,6 +103,8 @@ namespace EBTP.Repository.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ListingId");
 
                     b.HasIndex("UserId");
 
@@ -771,11 +776,19 @@ namespace EBTP.Repository.Migrations
 
             modelBuilder.Entity("EBTP.Repository.Entities.ChatThread", b =>
                 {
+                    b.HasOne("EBTP.Repository.Entities.Listing", "Listing")
+                        .WithMany()
+                        .HasForeignKey("ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("EBTP.Repository.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Listing");
 
                     b.Navigation("User");
                 });

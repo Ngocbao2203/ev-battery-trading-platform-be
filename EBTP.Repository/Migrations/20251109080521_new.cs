@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EBTP.Repository.Migrations
 {
     /// <inheritdoc />
-    public partial class messageandchatthread : Migration
+    public partial class @new : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -172,6 +172,40 @@ namespace EBTP.Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ChatThread",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ParticipantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ListingId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModificationBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeletionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ChatThread", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ChatThread_Listing_ListingId",
+                        column: x => x.ListingId,
+                        principalTable: "Listing",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ChatThread_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Favourite",
                 columns: table => new
                 {
@@ -296,6 +330,36 @@ namespace EBTP.Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Message",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ChatThreadId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SenderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MessageText = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false),
+                    SentAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ReadAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModificationBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    DeletionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeleteBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Message", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Message_ChatThread_ChatThreadId",
+                        column: x => x.ChatThreadId,
+                        principalTable: "ChatThread",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Transaction",
                 columns: table => new
                 {
@@ -365,6 +429,16 @@ namespace EBTP.Repository.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_ChatThread_ListingId",
+                table: "ChatThread",
+                column: "ListingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ChatThread_UserId",
+                table: "ChatThread",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Favourite_ListingId",
                 table: "Favourite",
                 column: "ListingId");
@@ -393,6 +467,11 @@ namespace EBTP.Repository.Migrations
                 name: "IX_ListingImage_ListingId",
                 table: "ListingImage",
                 column: "ListingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Message_ChatThreadId",
+                table: "Message",
+                column: "ChatThreadId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payment_ListingId",
@@ -446,10 +525,16 @@ namespace EBTP.Repository.Migrations
                 name: "ListingImage");
 
             migrationBuilder.DropTable(
+                name: "Message");
+
+            migrationBuilder.DropTable(
                 name: "Report");
 
             migrationBuilder.DropTable(
                 name: "Transaction");
+
+            migrationBuilder.DropTable(
+                name: "ChatThread");
 
             migrationBuilder.DropTable(
                 name: "Payment");

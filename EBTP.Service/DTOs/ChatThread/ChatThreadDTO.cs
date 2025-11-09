@@ -10,5 +10,6 @@ namespace EBTP.Service.DTOs.ChatThread
     {
         public Guid UserId { get; set; }
         public Guid ParticipantId { get; set; }
+        public Guid ListingId { get; set; }
     }
 }
