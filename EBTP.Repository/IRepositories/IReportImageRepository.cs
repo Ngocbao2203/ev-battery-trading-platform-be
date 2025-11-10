@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace EBTP.Repository.IRepositories
 {
-    public interface ITransactionRepository : IGenericRepository<Transaction>
+    public interface IReportImageRepository : IGenericRepository<ReportImage>
     {
-        Task<List<Transaction>> GetTransactionsByUserId(Guid userId, int pageIndex, int pageSize);
     }
 }

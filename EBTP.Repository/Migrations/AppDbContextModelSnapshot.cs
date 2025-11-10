@@ -508,10 +508,6 @@ namespace EBTP.Repository.Migrations
                     b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ImageReport")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -541,6 +537,47 @@ namespace EBTP.Repository.Migrations
                         .IsUnique();
 
                     b.ToTable("Report");
+                });
+
+            modelBuilder.Entity("EBTP.Repository.Entities.ReportImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("DeleteBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ModificationBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ModificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ReportId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReportId");
+
+                    b.ToTable("ReportImage");
                 });
 
             modelBuilder.Entity("EBTP.Repository.Entities.Role", b =>
@@ -883,6 +920,17 @@ namespace EBTP.Repository.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("EBTP.Repository.Entities.ReportImage", b =>
+                {
+                    b.HasOne("EBTP.Repository.Entities.Report", "Report")
+                        .WithMany("ReportImages")
+                        .HasForeignKey("ReportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Report");
+                });
+
             modelBuilder.Entity("EBTP.Repository.Entities.Transaction", b =>
                 {
                     b.HasOne("EBTP.Repository.Entities.Listing", "Listing")
@@ -954,6 +1002,11 @@ namespace EBTP.Repository.Migrations
             modelBuilder.Entity("EBTP.Repository.Entities.Payment", b =>
                 {
                     b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("EBTP.Repository.Entities.Report", b =>
+                {
+                    b.Navigation("ReportImages");
                 });
 
             modelBuilder.Entity("EBTP.Repository.Entities.Role", b =>

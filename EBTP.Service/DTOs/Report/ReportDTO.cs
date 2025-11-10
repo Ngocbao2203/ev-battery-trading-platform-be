@@ -1,4 +1,5 @@
 ﻿using EBTP.Repository.Enum;
+using EBTP.Service.DTOs.ReportImage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace EBTP.Service.DTOs.Report
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public Guid ListingId { get; set; }
-        public string ImageReport { get; set; }
+        public List<ReportImageDTO?> ReportImages { get; set; }
         public ReportReasonEnum Reason { get; set; }
         public string? OtherReason { get; set; }
     }

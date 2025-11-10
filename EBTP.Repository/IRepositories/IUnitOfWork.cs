@@ -20,6 +20,7 @@ namespace EBTP.Repository.IRepositories
         IReportRepository reportRepository { get; }
         IMessageRepository messageRepository { get; }
         IChatThreadRepository chatThreadRepository { get; }
+        IReportImageRepository reportImageRepository { get; }
         public Task<int> SaveChangeAsync();
     }
 }

@@ -14,6 +14,6 @@ namespace EBTP.Service.DTOs.Report
         public Guid ListingId { get; set; }
         public ReportReasonEnum Reason { get; set; }
         public string? OtherReason { get; set; }
-        public IFormFile ImageReport { get; set; }
+        public List<IFormFile> ReportImages { get; set; }
     }
 }

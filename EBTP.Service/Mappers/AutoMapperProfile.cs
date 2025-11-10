@@ -8,6 +8,8 @@ using EBTP.Service.DTOs.ListingImage;
 using EBTP.Service.DTOs.Message;
 using EBTP.Service.DTOs.Package;
 using EBTP.Service.DTOs.Report;
+using EBTP.Service.DTOs.ReportImage;
+using EBTP.Service.DTOs.Transaction;
 using EBTP.Service.DTOs.User;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -55,7 +57,9 @@ namespace EBTP.Service.Mappers
 
             //Report
             CreateMap<Report, ReportDTO>().ReverseMap();
-            CreateMap<Report, CreateReportDTO>().ReverseMap();
+            CreateMap<Report, CreateReportDTO>()
+                .ForMember(dest => dest.ReportImages, opt => opt.Ignore())
+                .ReverseMap();
 
             //Message
             CreateMap<SendMessageDTO, Message>().ReverseMap();
@@ -68,6 +72,14 @@ namespace EBTP.Service.Mappers
             CreateMap<ChatThreadDTO, ChatThread>().ReverseMap();
             CreateMap<ChatThread, CreateChatThreadDTO>()
             .ReverseMap();
+
+            //ReportImage
+            CreateMap<ReportImageDTO, ReportImage>().ReverseMap();
+            CreateMap<IFormFile, ReportImage>()
+            .ForMember(dest => dest.ImageUrl, opt => opt.Ignore());
+
+            //Transaction
+            CreateMap<Transaction, TransactionDTO>().ReverseMap();
         }
     }
 }
