@@ -216,7 +216,7 @@ namespace EBTP.Service.Services
 
             var consultant = await _unitOfWork.userRepository.GetByIdAsync(chatThread.ParticipantId);
 
-            if (user == null)
+            if (consultant == null)
             {
                 return new Result<object>
                 {
@@ -238,7 +238,7 @@ namespace EBTP.Service.Services
             }
 
             var existingThread = await _unitOfWork.chatThreadRepository
-                .GetExistingChatThreadByIdAsync(chatThread.UserId, chatThread.ParticipantId);
+                .GetExistingChatThreadByIdAsync(chatThread.UserId, chatThread.ParticipantId, chatThread.ListingId);
 
             if (existingThread != null)
             {
