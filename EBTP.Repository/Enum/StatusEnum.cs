@@ -12,6 +12,7 @@ namespace EBTP.Repository.Enum
         Active,
         Inactive,
         Rejected,
-        Expired
+        Expired,
+        Sold
     }
 }

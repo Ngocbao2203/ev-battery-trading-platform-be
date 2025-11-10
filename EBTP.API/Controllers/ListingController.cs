@@ -88,6 +88,16 @@ namespace EBTP.API.Controllers
             }
             return Ok(result);
         }
+        [HttpPut("ComfirmedSold/{listingId}")]
+        public async Task<IActionResult> ComfirmedSold([FromRoute] Guid listingId)
+        {
+            var result = await _listingService.ConfirmedSold(listingId);
+            if (result.Error != 0)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
         [HttpGet("MyListings")]
         [Authorize] // Đảm bảo user đã login
         public async Task<ActionResult<Result<List<ListingDTO>>>> GetMyListings([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
