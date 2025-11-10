@@ -173,6 +173,7 @@ namespace EBTP.Service.Services
             {
                 var responseData = new
                 {
+                    chatThreadId = message.ChatThreadId,
                     message.CreatedBy,
                     message.CreationDate,
                     message.SenderId,
@@ -181,7 +182,7 @@ namespace EBTP.Service.Services
                     message.IsRead
                 };
 
-                await _messageNotifier.NotifyMessageSentAsync(chatThread.Id, responseData, "Message");
+                await _messageNotifier.NotifyMessageSentAsync(chatThread.Id, chatThread.UserId, chatThread.ParticipantId, responseData, "Message");
                 return new Result<object>
                 {
                     Error = 0,

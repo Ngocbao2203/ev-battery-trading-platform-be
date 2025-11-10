@@ -8,6 +8,6 @@ namespace EBTP.Service.IServices
 {
     public interface IMessageNotifier
     {
-        Task NotifyMessageSentAsync(Guid chatThreadId, object payload, string type);
+        Task NotifyMessageSentAsync(Guid chatThreadId, Guid userId, Guid participantId, object payload, string type);
     }
 }
