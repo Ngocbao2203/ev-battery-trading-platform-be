@@ -16,5 +16,7 @@ namespace EBTP.Repository.IRepositories
         Task<List<Listing>> GetListingsByUserId(Guid userId, int pageIndex, int pageSize);
         Task<bool> CheckIsFirstListing(Guid userId);
         Task<List<Listing>> CheckListingExpired();
+        //Dashboard
+        Task<List<Listing>> GetListingForDashBoard(CategoryEnum categoryEnum, ListingStatusEnum listingStatusEnum);
     }
 }

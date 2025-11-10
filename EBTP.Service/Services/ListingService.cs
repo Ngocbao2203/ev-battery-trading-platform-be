@@ -3,6 +3,7 @@ using EBTP.Repository.Entities;
 using EBTP.Repository.Enum;
 using EBTP.Repository.IRepositories;
 using EBTP.Service.Abstractions.Shared;
+using EBTP.Service.DTOs.Dashboard;
 using EBTP.Service.DTOs.Listing;
 using EBTP.Service.IServices;
 using Microsoft.AspNetCore.Http;
@@ -613,6 +614,32 @@ namespace EBTP.Service.Services
             }
 
             await _unitOfWork.SaveChangeAsync();
+        }
+        public async Task<Result<ListingDashboard>> ListingDashboard()
+        {
+            var getTotalOldCars = await _unitOfWork.listingRepository.GetListingForDashBoard(CategoryEnum.ElectricCar, ListingStatusEnum.Used);
+            var getTotalNewCars = await _unitOfWork.listingRepository.GetListingForDashBoard(CategoryEnum.ElectricCar, ListingStatusEnum.New);
+            var getTotalNewBikes = await _unitOfWork.listingRepository.GetListingForDashBoard(CategoryEnum.ElectricMotorbike, ListingStatusEnum.New);
+            var getTotalOldBikes = await _unitOfWork.listingRepository.GetListingForDashBoard(CategoryEnum.ElectricMotorbike, ListingStatusEnum.Used);
+            var getTotalNewBateries = await _unitOfWork.listingRepository.GetListingForDashBoard(CategoryEnum.RemovableBattery, ListingStatusEnum.New);
+            var getTotalOldBateries = await _unitOfWork.listingRepository.GetListingForDashBoard(CategoryEnum.RemovableBattery, ListingStatusEnum.Used);
+            var getAllListing = await _unitOfWork.listingRepository.GetAllAsync();
+
+            return new Result<ListingDashboard>()
+            {
+                Error = 0,
+                Message = "Lấy dữ liệu dashboard thành công",
+                Data = new ListingDashboard
+                {
+                    TotalListings = getAllListing.Count(),
+                    TotalOldCars = getTotalOldCars.Count(),
+                    TotalNewCars = getTotalNewCars.Count(),
+                    TotalNewBikes = getTotalNewBikes.Count(),
+                    TotalOldBikes = getTotalOldBikes.Count(),
+                    TotalNewBateries = getTotalNewBateries.Count(),
+                    TotalOldBateries = getTotalOldBateries.Count()
+                }
+            };
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using EBTP.Repository.Enum;
 using EBTP.Service.Abstractions.Shared;
+using EBTP.Service.DTOs.Dashboard;
 using EBTP.Service.DTOs.Listing;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -30,5 +31,7 @@ namespace EBTP.Service.IServices
         
         //Hangfire
         Task AutoChangeStatusWhenListingExpiredAsync();
+        //Dashboard
+        Task<Result<ListingDashboard>> ListingDashboard();
     }
 }

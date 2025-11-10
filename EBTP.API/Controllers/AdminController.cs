@@ -29,5 +29,15 @@ namespace EBTP.API.Controllers
             }
             return Ok(result);
         }
+        [HttpGet("Listing-Dashboard")]
+        public async Task<IActionResult> GetListingDashboard()
+        {
+            var result = await _listingService.ListingDashboard();
+            if (result.Error != 0)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
     }
 }

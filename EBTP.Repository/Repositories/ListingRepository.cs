@@ -128,5 +128,14 @@ namespace EBTP.Repository.Repositories
 
             return expiredListings;
         }
+        public async Task<List<Listing>> GetListingForDashBoard(CategoryEnum categoryEnum, ListingStatusEnum listingStatusEnum)
+        {
+            return await _context.Listing
+                .Include(lt => lt.ListingImages)
+                .Include(lt => lt.Brand)
+                .Include(lt => lt.User)
+                .Where(x => x.Category == categoryEnum && x.ListingStatus == listingStatusEnum)
+                .ToListAsync();
+        }
     }
 }
