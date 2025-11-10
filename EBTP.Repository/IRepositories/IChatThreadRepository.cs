@@ -11,7 +11,7 @@ namespace EBTP.Repository.IRepositories
     {
         Task<ChatThread?> GetChatThreadByIdAsync(Guid chatThreadId);
         Task<List<ChatThread?>> GetChatThreadByUserIdAsync(Guid userId);
-        Task<ChatThread?> GetExistingChatThreadByIdAsync(Guid userId, Guid participantId);
+        Task<ChatThread?> GetExistingChatThreadByIdAsync(Guid userId, Guid participantId, Guid listingId);
         Task<ChatThread?> GetChatThreadByListingAsync(Guid listingId);
 
     }

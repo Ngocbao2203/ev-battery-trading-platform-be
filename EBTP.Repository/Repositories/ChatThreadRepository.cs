@@ -86,12 +86,13 @@ namespace EBTP.Repository.Repositories
         }
 
 
-        public async Task<ChatThread?> GetExistingChatThreadByIdAsync(Guid userId, Guid participantId)
+        public async Task<ChatThread?> GetExistingChatThreadByIdAsync(Guid userId, Guid participantId, Guid listingId)
         {
             return await _context.ChatThread
                 .Include(ct => ct.User)
                 .FirstOrDefaultAsync(ct => ct.UserId == userId
                                         && ct.ParticipantId == participantId
+                                        && ct.ListingId == listingId
                                         && !ct.IsDeleted);
         }
     }
