@@ -49,7 +49,7 @@ namespace EBTP.API.Controllers
             }
             return Ok(result);
         }
-        [HttpPut("UbBan-User/{userId}")]
+        [HttpPut("UnBan-User/{userId}")]
         public async Task<IActionResult> UnBanUser(Guid userId)
         {
             var result = await _userService.UnBanUser(userId);

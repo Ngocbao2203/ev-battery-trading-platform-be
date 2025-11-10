@@ -31,6 +31,7 @@ namespace EBTP.Repository.Repositories
             return await _context.Report
                 .Include(r => r.User)
                 .Include(r => r.Listing)
+                .Include(r => r.ReportImages)
                 .OrderByDescending(r => r.CreationDate)
                 .Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)

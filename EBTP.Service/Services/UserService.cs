@@ -122,6 +122,7 @@ namespace EBTP.Service.Services
         public async Task<Result<object>> BanUser(Guid userId, string descriptionBan)
         {
             var getUser = await _unitOfWork.userRepository.GetUserById(userId);
+            var getListingByUser = await _unitOfWork.listingRepository.GetListingsByUserId(userId, 1, int.MaxValue);
             if (getUser == null)
             {
                 return new Result<object>()
@@ -144,6 +145,11 @@ namespace EBTP.Service.Services
             getUser.IsBanned = true;
             getUser.Status = StatusEnum.Inactive;
             getUser.BanDescription = descriptionBan;
+            foreach (var listing in getListingByUser)
+            {
+                listing.Status = StatusEnum.Inactive;
+                _unitOfWork.listingRepository.Update(listing);
+            }
             await _unitOfWork.userRepository.UpdateAsync(getUser);
             return new Result<object>()
             {

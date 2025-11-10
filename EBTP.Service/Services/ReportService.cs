@@ -97,8 +97,32 @@ namespace EBTP.Service.Services
 
                 var report = _mapper.Map<Report>(reportDTO);
                 report.Id = Guid.NewGuid();
-                var uploadResult = await _cloudinaryService.UploadProductImage(reportDTO.ImageReport, FOLDER);
-                report.ImageReport = uploadResult.SecureUrl.ToString();
+                report.ReportImages = new List<ReportImage>();
+                if (reportDTO.ReportImages != null && reportDTO.ReportImages.Count > 5)
+                {
+                    return new Result<object>
+                    {
+                        Error = 1,
+                        Message = "Chỉ được tải lên tối đa 5 ảnh.",
+                        Data = null
+                    };
+                }
+
+                if (reportDTO.ReportImages != null && reportDTO.ReportImages.Any())
+                {
+                    foreach (var image in reportDTO.ReportImages)
+                    {
+                        var uploadResult = await _cloudinaryService.UploadProductImage(image, FOLDER);
+
+                        if (uploadResult != null)
+                        {
+                            report.ReportImages.Add(new ReportImage
+                            {
+                                ImageUrl = uploadResult.SecureUrl.ToString()
+                            });
+                        }
+                    }
+                }
                 report.CreationDate = DateTime.UtcNow.AddHours(7);
 
                 await _unitOfWord.reportRepository.AddAsync(report);

@@ -32,6 +32,7 @@ builder.Services.AddScoped<IFavouriteRepository, FavouriteRepository>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IChatThreadRepository, ChatThreadRepository>();
+builder.Services.AddScoped<IReportImageRepository, ReportImageRepository>();
 
 //Service
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -44,6 +45,7 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IFavouriteService, FavouriteService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
 
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IMessageNotifier, MessageNotifier>();
