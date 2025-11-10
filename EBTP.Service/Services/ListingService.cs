@@ -601,6 +601,55 @@ namespace EBTP.Service.Services
                 };
             }
         }
+        public async Task<Result<object>> ConfirmedSold(Guid listingId)
+        {
+            try
+            {
+                var listing = await _unitOfWork.listingRepository.GetListingById(listingId);
+                if (listing == null)
+                {
+                    return new Result<object>
+                    {
+                        Error = 1,
+                        Message = "Không tìm thấy bài đăng.",
+                        Count = 0
+                    };
+                }
+
+                if (listing.Status == StatusEnum.Sold)
+                {
+                    return new Result<object>
+                    {
+                        Error = 1,
+                        Message = "Bài đăng này đã được xác nhận bán trước đó.",
+                        Count = 0
+                    };
+                }
+
+                listing.Status = StatusEnum.Sold;
+                listing.ModificationDate = DateTime.UtcNow.AddHours(7);
+
+                _unitOfWork.listingRepository.Update(listing);
+                await _unitOfWork.SaveChangeAsync();
+
+                return new Result<object>
+                {
+                    Error = 0,
+                    Message = "Xác nhận bán thành công. Bài đăng đã được ẩn.",
+                    Count = 1,
+                    Data = new { listing.Id, listing.Title, listing.ListingStatus }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = $"Lỗi khi xác nhận bán: {ex.Message}",
+                    Count = 0
+                };
+            }
+        }
         //Hangfire
         public async Task AutoChangeStatusWhenListingExpiredAsync()
         {
