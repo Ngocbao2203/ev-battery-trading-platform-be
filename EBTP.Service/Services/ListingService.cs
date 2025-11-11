@@ -158,12 +158,12 @@ namespace EBTP.Service.Services
                         Data = null
                     };
                 }
-                if (createListingDTO.ListingImages != null && createListingDTO.ListingImages.Count > 5)
+                if (createListingDTO.ListingImages != null && createListingDTO.ListingImages.Count > 10)
                 {
                     return new Result<object>
                     {
                         Error = 1,
-                        Message = "Chỉ được tải lên tối đa 5 ảnh.",
+                        Message = "Chỉ được tải lên tối đa 10 ảnh.",
                         Data = null
                     };
                 }

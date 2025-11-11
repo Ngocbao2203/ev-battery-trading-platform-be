@@ -98,12 +98,12 @@ namespace EBTP.Service.Services
                 var report = _mapper.Map<Report>(reportDTO);
                 report.Id = Guid.NewGuid();
                 report.ReportImages = new List<ReportImage>();
-                if (reportDTO.ReportImages != null && reportDTO.ReportImages.Count > 5)
+                if (reportDTO.ReportImages != null && reportDTO.ReportImages.Count > 10)
                 {
                     return new Result<object>
                     {
                         Error = 1,
-                        Message = "Chỉ được tải lên tối đa 5 ảnh.",
+                        Message = "Chỉ được tải lên tối đa 10 ảnh.",
                         Data = null
                     };
                 }
