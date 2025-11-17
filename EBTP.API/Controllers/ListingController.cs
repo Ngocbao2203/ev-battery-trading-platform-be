@@ -88,6 +88,19 @@ namespace EBTP.API.Controllers
             }
             return Ok(result);
         }
+
+        // New: Delete listing by id
+        [HttpDelete("Delete/{listingId}")]
+        public async Task<IActionResult> DeleteListing([FromRoute] Guid listingId)
+        {
+            var result = await _listingService.DeleteAsync(listingId);
+            if (result.Error != 0)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
         [HttpPut("ComfirmedSold/{listingId}")]
         public async Task<IActionResult> ComfirmedSold([FromRoute] Guid listingId)
         {

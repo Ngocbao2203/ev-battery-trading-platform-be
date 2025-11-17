@@ -690,5 +690,33 @@ namespace EBTP.Service.Services
                 }
             };
         }
+
+        public async Task<Result<object>> DeleteAsync(Guid listingId)
+        {
+            var listing = await _unitOfWork.listingRepository.GetByIdAsync(listingId);
+            if (listing == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Không tìm thấy tin đăng",
+                    Count = 0,
+                    Data = null
+                };
+            }
+
+            // Soft-delete; change to hard-delete if desired
+            listing.IsDeleted = true;
+            _unitOfWork.listingRepository.Update(listing);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Xóa tin đăng thành công",
+                Count = 1,
+                Data = null
+            };
+        }
     }
 }
