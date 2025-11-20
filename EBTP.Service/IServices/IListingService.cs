@@ -18,6 +18,7 @@ namespace EBTP.Service.IServices
         Task<Result<ListingDTO>> GetByIdAsync(Guid id);
         Task<Result<List<ListingDTO>>> GetMyListingsAsync(int pageIndex, int pageSize);
         Task<Result<object>> CreateAsync(CreateListingDTO createListingDTO);
+        Task<Result<object>> DeleteAsync(Guid listingId);
         /*        Task<Result<ListingDTO>> UpdateAsync(Guid id, UpdateListingDTO updateListingDTO);
                 Task<Result<bool>> DeleteAsync(Guid id);*/
         Task<Result<string>> CreateVnPayUrlAsync(Guid listingId, HttpContext httpContext);

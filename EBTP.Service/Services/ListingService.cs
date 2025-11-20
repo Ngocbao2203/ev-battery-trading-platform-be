@@ -158,12 +158,12 @@ namespace EBTP.Service.Services
                         Data = null
                     };
                 }
-                if (createListingDTO.ListingImages != null && createListingDTO.ListingImages.Count > 5)
+                if (createListingDTO.ListingImages != null && createListingDTO.ListingImages.Count > 10)
                 {
                     return new Result<object>
                     {
                         Error = 1,
-                        Message = "Chỉ được tải lên tối đa 5 ảnh.",
+                        Message = "Chỉ được tải lên tối đa 10 ảnh.",
                         Data = null
                     };
                 }
@@ -688,6 +688,34 @@ namespace EBTP.Service.Services
                     TotalNewBateries = getTotalNewBateries.Count(),
                     TotalOldBateries = getTotalOldBateries.Count()
                 }
+            };
+        }
+
+        public async Task<Result<object>> DeleteAsync(Guid listingId)
+        {
+            var listing = await _unitOfWork.listingRepository.GetByIdAsync(listingId);
+            if (listing == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Không tìm thấy tin đăng",
+                    Count = 0,
+                    Data = null
+                };
+            }
+
+            // Soft-delete; change to hard-delete if desired
+            listing.IsDeleted = true;
+            _unitOfWork.listingRepository.Update(listing);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Xóa tin đăng thành công",
+                Count = 1,
+                Data = null
             };
         }
     }
