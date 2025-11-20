@@ -122,7 +122,7 @@ namespace EBTP.API.Controllers
         {
             var result = await _listingService.HandleVnPayReturnAsync(Request.Query);
             var status = result.Error == 0 ? "success" : "failed";
-            return Redirect($"http://localhost:5173/payment-{status}");
+            return Redirect($"https://ebtpapi20251022225041-dta2fggqhqd5brej.indonesiacentral-01.azurewebsites.net/api/payment-{status}");
             //return Ok(result);
         }
     }
