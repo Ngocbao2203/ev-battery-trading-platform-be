@@ -1,4 +1,6 @@
-﻿using EBTP.Service.Abstractions.Shared;
+﻿using EBTP.Repository.Enum;
+using EBTP.Repository.IRepositories;
+using EBTP.Service.Abstractions.Shared;
 using EBTP.Service.DTOs.Listing;
 using EBTP.Service.IServices;
 using Microsoft.AspNetCore.Authorization;
@@ -12,10 +14,12 @@ namespace EBTP.API.Controllers
     public class ListingController : ControllerBase
     {
         private readonly IListingService _listingService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ListingController(IListingService listingService)
+        public ListingController(IListingService listingService, IUnitOfWork unitOfWork)
         {
             _listingService = listingService;
+            _unitOfWork = unitOfWork;
         }
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll([FromQuery] string? search, [FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, [FromQuery] decimal? from = null, [FromQuery] decimal? to = null, [FromQuery] EBTP.Repository.Enum.ListingStatusEnum? listingStatusEnum = null, [FromQuery] EBTP.Repository.Enum.CategoryEnum? categoryEnum = null)
@@ -133,10 +137,33 @@ namespace EBTP.API.Controllers
         [HttpGet("vnpay-return")]
         public async Task<IActionResult> VnPayReturn()
         {
-            var result = await _listingService.HandleVnPayReturnAsync(Request.Query);
-            var status = result.Error == 0 ? "success" : "failed";
-            return Redirect($"https://ebtpapi20251022225041-dta2fggqhqd5brej.indonesiacentral-01.azurewebsites.net/api/payment-{status}");
-            //return Ok(result);
+            var query = HttpContext.Request.Query;
+
+            // lấy payment type để biết gọi hàm nào
+            var transactionNo = query["vnp_TxnRef"].ToString();
+            var payment = await _unitOfWork.paymentRepository.GetByTransactionNoAsync(transactionNo);
+
+            if (payment.PaymentTypeEnum == PaymentTypeEnum.ListingBuy)
+            {
+                var result = await _listingService.HandlePostListingPaymentAsync(query);
+                var status = result.Error == 0 ? "success" : "failed";
+                return Redirect($"https://voltx-three.vercel.app/payment-{status}");
+            }
+
+            if (payment.PaymentTypeEnum == PaymentTypeEnum.ListingPost)
+            {
+                var result = await _listingService.HandleVnPayReturnAsync(query);
+                var status = result.Error == 0 ? "success" : "failed";
+                return Redirect($"https://voltx-three.vercel.app/payment-{status}");
+            }
+
+            return BadRequest("Loại thanh toán không hợp lệ.");
+        }
+        [HttpGet("BuyListing/{listingId}")]
+        public async Task<IActionResult> BuyListing(Guid listingId)
+        {
+            var result = await _listingService.BuyListing(listingId, HttpContext);
+            return StatusCode(result.Error == 0 ? 200 : 400, result);
         }
     }
 }

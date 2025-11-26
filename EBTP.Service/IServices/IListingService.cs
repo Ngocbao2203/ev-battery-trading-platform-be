@@ -35,5 +35,8 @@ namespace EBTP.Service.IServices
         Task AutoChangeStatusWhenListingExpiredAsync();
         //Dashboard
         Task<Result<ListingDashboard>> ListingDashboard();
+
+        Task<Result<object>> HandlePostListingPaymentAsync(IQueryCollection query);
+        Task<Result<string>> BuyListing(Guid listingId, HttpContext httpContext);
     }
 }
