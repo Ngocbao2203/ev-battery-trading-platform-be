@@ -18,6 +18,7 @@ namespace EBTP.Service.DTOs.Transaction
         public DateTime TransactionDate { get; set; }
         public string? Notes { get; set; }
         public PaymentStatusEnum Status { get; set; }
+        public PaymentTypeEnum PaymentTypeEnum { get; set; }
         public string? PaymentMethod { get; set; }
         public ListingDTO Listing { get; set; }
         public PackageDTO Package { get; set; }

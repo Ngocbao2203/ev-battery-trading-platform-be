@@ -10,7 +10,7 @@ namespace EBTP.Repository.Entities
 {
     public class Transaction : BaseEntity
     {
-        public Guid UserId { get; set; }
+        public Guid? UserId { get; set; }
         public Guid ListingId { get; set; }
         public Guid PackageId { get; set; }
         public Guid? PaymentId { get; set; }
@@ -20,6 +20,8 @@ namespace EBTP.Repository.Entities
         public DateTime TransactionDate { get; set; } = DateTime.UtcNow.AddHours(7);
         public string? Notes { get; set; }
         public PaymentStatusEnum Status { get; set; } = PaymentStatusEnum.Pending;
+        public PaymentTypeEnum PaymentTypeEnum { get; set; }
+       
         public string? PaymentMethod { get; set; }
 
         [ForeignKey(nameof(ListingId))]

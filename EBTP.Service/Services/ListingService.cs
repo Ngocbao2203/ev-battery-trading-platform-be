@@ -233,6 +233,7 @@ namespace EBTP.Service.Services
                 PaymentMethod = PaymentMethodEnum.VnPay,
                 CreationDate = DateTime.UtcNow.AddHours(7),
                 CreatedAt = DateTime.UtcNow.AddHours(7),
+                PaymentTypeEnum = PaymentTypeEnum.ListingPost,
                 IsDeleted = false
             };
 
@@ -294,6 +295,7 @@ namespace EBTP.Service.Services
                 PaymentMethod = PaymentMethodEnum.VnPay,
                 CreationDate = DateTime.UtcNow.AddHours(7),
                 CreatedAt = DateTime.UtcNow.AddHours(7),
+                PaymentTypeEnum = PaymentTypeEnum.ListingPost,
                 IsDeleted = false
             }; await _unitOfWork.paymentRepository.AddAsync(payment);
             await _unitOfWork.SaveChangeAsync();
@@ -720,6 +722,16 @@ namespace EBTP.Service.Services
         }
         public async Task<Result<string>> BuyListing(Guid listingId, HttpContext httpContext)
         {
+            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+            if (token == null)
+                return new Result<string>() { Error = 1, Message = "Token not found", Data = null };
+
+            var jwtToken = new JwtSecurityTokenHandler().ReadToken(token) as JwtSecurityToken;
+
+            if (jwtToken == null)
+                return new Result<string>() { Error = 1, Message = "Invalid token", Data = null };
+            var userId = Guid.Parse(jwtToken.Claims.First(claim => claim.Type == "id").Value);
             var listing = await _unitOfWork.listingRepository.GetListingById(listingId);
             if (listing == null)
             {
@@ -749,7 +761,7 @@ namespace EBTP.Service.Services
                 Id = Guid.NewGuid(),
                 TransactionNo = transactionNo,
                 ListingId = listingId,
-                CreatedBy = listing.UserId,
+                CreatedBy = userId,
                 PaymentMethod = PaymentMethodEnum.VnPay,
                 CreationDate = DateTime.UtcNow.AddHours(7),
                 CreatedAt = DateTime.UtcNow.AddHours(7),
@@ -769,6 +781,7 @@ namespace EBTP.Service.Services
                 Data = url
             };
         }
+
         public async Task<Result<object>> HandlePostListingPaymentAsync(IQueryCollection query)
         {
             var transactionNo = query["vnp_TxnRef"].ToString();
@@ -792,17 +805,53 @@ namespace EBTP.Service.Services
 
             var responseCode = query["vnp_ResponseCode"].ToString();
             var isValid = await _paymentService.ValidateReturnData(query);
-
+            var userId = payment.CreatedBy;
             if (isValid && responseCode == "00")
             {
                 listing.Status = StatusEnum.Sold;
                 listing.PaymentStatus = PaymentStatusEnum.Success;
                 listing.ActivatedAt = null;
                 listing.ExpiredAt = null;
+                var newTransaction = new Transaction
+                {
+                    Id = Guid.NewGuid(),
+                    Amount = listing.Price,
+                    UserId = (Guid)userId,
+                    ListingId = listing.Id,
+                    PaymentId = payment.Id,
+                    PackageId = (Guid)listing.PackageId,
+                    Currency = "VND",
+                    PaymentMethod = "Online",
+                    Status = PaymentStatusEnum.Success,
+                    TransactionDate = DateTime.UtcNow.AddHours(7),
+                    Notes = @$"Mua hàng thành công cho sản phẩm: ""{listing.Title}""",
+                    PaymentTypeEnum = PaymentTypeEnum.ListingBuy,
+                    IsDeleted = false,
+                    CreationDate = DateTime.UtcNow.AddHours(7)
+                };
+                await _unitOfWork.transactionRepository.AddAsync(newTransaction);
             }
             else
             {
                 listing.PaymentStatus = PaymentStatusEnum.Failed;
+                var failedTransaction = new Transaction
+                {
+                    Id = Guid.NewGuid(),
+                    Amount = listing.Price,
+                    UserId = (Guid)userId,
+                    ListingId = listing.Id,
+                    PaymentId = payment.Id,
+                    PackageId = (Guid)listing.PackageId,
+                    Currency = "VND",
+                    PaymentMethod = "Online",
+                    Status = PaymentStatusEnum.Canceled,
+                    Notes = @$"Mua hàng thất bại cho sản phẩm: ""{listing.Title}""",
+                    CreatedBy = userId,
+                    IsDeleted = false,
+                    PaymentTypeEnum = PaymentTypeEnum.ListingBuy,
+                    CreationDate = DateTime.UtcNow.AddHours(7)
+                };
+                await _unitOfWork.transactionRepository.AddAsync(failedTransaction);
             }
 
             listing.ModificationDate = DateTime.UtcNow.AddHours(7);
