@@ -22,5 +22,6 @@ namespace EBTP.Repository.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow.AddHours(7);
 
         public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
+        public PaymentTypeEnum PaymentTypeEnum { get; set; }
     }
 }

@@ -471,6 +471,9 @@ namespace EBTP.Repository.Migrations
                     b.Property<int>("PaymentMethod")
                         .HasColumnType("int");
 
+                    b.Property<int>("PaymentTypeEnum")
+                        .HasColumnType("int");
+
                     b.Property<string>("RawData")
                         .HasColumnType("nvarchar(max)");
 
